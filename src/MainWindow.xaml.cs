@@ -30,20 +30,20 @@ namespace UGTLive
 
         [DllImport("user32.dll")]
         private static extern bool ClientToScreen(IntPtr hWnd, ref System.Drawing.Point lpPoint);
-        
+
         [DllImport("user32.dll")]
         private static extern int ShowCursor(bool bShow);
-        
+
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetConsoleWindow();
-        
+
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-        
+
         // ShowWindow commands
         private const int SW_HIDE = 0;
         private const int SW_SHOW = 5;
-        
+
 
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT
@@ -65,18 +65,18 @@ namespace UGTLive
 
         bool _bOCRCheckIsWanted = false;
         private DateTime _ocrReenableTime = DateTime.MinValue;
-        
-        public void SetOCRCheckIsWanted(bool bCaptureIsWanted) 
-        { 
+
+        public void SetOCRCheckIsWanted(bool bCaptureIsWanted)
+        {
             // Don't allow re-enabling OCR if we're still in the delay period after clearing overlays
             if (bCaptureIsWanted && DateTime.Now < _ocrReenableTime)
             {
                 Console.WriteLine($"OCR re-enable blocked - still in delay period for {(_ocrReenableTime - DateTime.Now).TotalSeconds:F1}s");
                 return;
             }
-            _bOCRCheckIsWanted = bCaptureIsWanted; 
+            _bOCRCheckIsWanted = bCaptureIsWanted;
         }
-        
+
         public bool GetOCRCheckIsWanted() { return _bOCRCheckIsWanted; }
         private bool isStarted = false;
         private bool _isSnapshotOverlayDisplayed = false;
@@ -85,44 +85,44 @@ namespace UGTLive
         private string outputPath = DEFAULT_OUTPUT_PATH;
         private WindowInteropHelper helper;
         private System.Drawing.Rectangle captureRect;
-        
+
         // Translation status timer and tracking
         private DispatcherTimer? _translationStatusTimer;
         private DateTime _translationStartTime;
         private bool _isShowingSettling = false;
-        
+
         // OCR status display (no tracking - handled by Logic.cs)
-        
+
         // Store previous capture position to calculate offset
         private int previousCaptureX;
         private int previousCaptureY;
-        
+
         // Auto translation
         private bool isAutoTranslateEnabled = false;
-        
+
         // ChatBox management
         private ChatBoxWindow? chatBoxWindow;
         private bool isChatBoxVisible = false;
         private bool isSelectingChatBoxArea = false;
         private bool _chatBoxEventsAttached = false;
-        
+
         // Keep translation history even when ChatBox is closed
         private List<TranslationEntry> _translationHistory = new List<TranslationEntry>();
-        
+
         // Accessor for ChatBoxWindow to get the translation history
         public List<TranslationEntry> GetTranslationHistory()
         {
             return _translationHistory;
         }
-        
+
         // Method to clear translation history
         public void ClearTranslationHistory()
         {
             _translationHistory.Clear();
             Console.WriteLine("Translation history cleared from MainWindow");
         }
-       
-  
+
+
         //allow this to be accesible through an "Instance" variable
         public static MainWindow Instance { get { return _this!; } }
 
@@ -160,36 +160,36 @@ namespace UGTLive
         }
         // Socket connection status
         private TextBlock? socketStatusText;
-        
+
         private IntPtr consoleWindow;
 
         static MainWindow? _this = null;
-     
+
         [DllImport("kernel32.dll")]
         public static extern bool AllocConsole();
-        
+
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool SetConsoleOutputCP(uint wCodePageID);
-        
+
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool SetConsoleCP(uint wCodePageID);
-        
+
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern bool SetCurrentConsoleFontEx(IntPtr hConsoleOutput, bool bMaximumWindow, ref CONSOLE_FONT_INFOEX lpConsoleCurrentFontEx);
-        
+
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern IntPtr GetStdHandle(int nStdHandle);
-        
+
         // Console mode control
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
-        
+
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
-        
+
         // Standard input handle constant
         public const int STD_INPUT_HANDLE = -10;
-        
+
         // Console input mode flags
         public const uint ENABLE_ECHO_INPUT = 0x0004;
         public const uint ENABLE_LINE_INPUT = 0x0002;
@@ -200,11 +200,11 @@ namespace UGTLive
         public const uint ENABLE_QUICK_EDIT_MODE = 0x0040;
         public const uint ENABLE_EXTENDED_FLAGS = 0x0080;
         public const uint ENABLE_AUTO_POSITION = 0x0100;
-        
+
         // Keyboard hooks are now managed in KeyboardShortcuts.cs
-        
+
         // We'll use a different approach that doesn't rely on SetConsoleCtrlHandler
-        
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct CONSOLE_FONT_INFOEX
         {
@@ -216,30 +216,30 @@ namespace UGTLive
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
             public string FaceName;
         }
-        
+
         [StructLayout(LayoutKind.Sequential)]
         public struct COORD
         {
             public short X;
             public short Y;
         }
-        
+
         public const int STD_OUTPUT_HANDLE = -11;
-        public bool GetIsStarted() { return isStarted; }    
+        public bool GetIsStarted() { return isStarted; }
         public bool GetTranslateEnabled() { return isAutoTranslateEnabled; }
-        
+
         // Methods for syncing UI controls with MonitorWindow
         // Flag to prevent saving during initialization
         private static bool _isInitializing = true;
-        
-        
+
+
         public void SetOcrMethod(string method)
         {
             if (ConfigManager.Instance.GetLogExtraDebugStuff())
             {
                 Console.WriteLine($"MainWindow.SetOcrMethod called with method: {method} (isInitializing: {_isInitializing})");
             }
-            
+
             // Only update the MainWindow's internal state during initialization
             // Don't update other windows or save to config
             if (_isInitializing)
@@ -269,7 +269,7 @@ namespace UGTLive
                 }
                 return;
             }
-            
+
             // Only process if actually changing the method
             if (selectedOcrMethod != method)
             {
@@ -298,51 +298,51 @@ namespace UGTLive
                 }
             }
         }
-        
+
         public void SetAutoTranslateEnabled(bool enabled)
         {
             if (isAutoTranslateEnabled != enabled)
             {
                 isAutoTranslateEnabled = enabled;
-                
+
                 // Save to config
                 ConfigManager.Instance.SetAutoTranslateEnabled(enabled);
-                
+
                 // Clear text objects
                 Logic.Instance.ClearAllTextObjects();
                 Logic.Instance.ResetHash();
-                
+
                 // Force OCR to run again
                 SetOCRCheckIsWanted(true);
-                
+
                 MonitorWindow.Instance.RefreshOverlays();
             }
         }
-        
+
         // The global keyboard hooks are now managed by KeyboardShortcuts class
-        
+
         public MainWindow()
         {
             // Make sure the initialization flag is set before anything else
             _isInitializing = true;
-            
+
             _this = this;
 
             // Set DataContext to self for property bindings
             this.DataContext = this;
 
             InitializeComponent();
-            
+
             // Set high-res icon
             IconHelper.SetWindowIcon(this);
 
             // Initialize console but keep it hidden initially
             InitializeConsole();
-            
+
             // Initialize LogWindow after console is set up
             // This ensures LogWindow wraps the properly configured console output
             _ = LogWindow.Instance;
-            
+
             // Hide the console window initially
             consoleWindow = GetConsoleWindow();
             KeyboardShortcuts.SetConsoleWindowHandle(consoleWindow);
@@ -356,23 +356,23 @@ namespace UGTLive
             _captureTimer.Interval = TimeSpan.FromSeconds(1 / 60.0f);
             _captureTimer.Tick += OnUpdateTick;
             _captureTimer.Start();
-            
+
             // Initial update of capture rectangle and setup after window is loaded
             this.Loaded += MainWindow_Loaded;
 
             // Subscribe to window size and location changes for persistence
             this.SizeChanged += MainWindow_SizeChanged;
             this.LocationChanged += MainWindow_LocationChanged;
-            
+
             // Create socket status text block
             CreateSocketStatusIndicator();
-            
+
             // Get reference to the already initialized ChatBoxWindow
             chatBoxWindow = ChatBoxWindow.Instance;
 
             // Register application-wide keyboard shortcut handler
             this.PreviewKeyDown += Application_KeyDown;
-            
+
             // Register hotkey events with the new HotkeyManager
             HotkeyManager.Instance.StartStopRequested += (s, e) => OnStartButtonToggleClicked(toggleButton, new RoutedEventArgs());
             HotkeyManager.Instance.MonitorToggleRequested += (s, e) => MonitorButton_Click(monitorButton, new RoutedEventArgs());
@@ -386,24 +386,24 @@ namespace UGTLive
             HotkeyManager.Instance.ClearOverlaysRequested += (s, e) => {
                 // Cancel any in-progress translation
                 Logic.Instance.CancelTranslation();
-                
+
                 // Clear text objects instantly
                 Logic.Instance.ClearAllTextObjects();
-                
+
                 // Clear hash so OCR will recreate text if active
                 Logic.Instance.ResetHash();
-                
+
                 // Clear snapshot overlay state
                 _isSnapshotOverlayDisplayed = false;
-                
+
                 // Immediately disable OCR capture to prevent it from triggering during the delay
                 SetOCRCheckIsWanted(false);
-                
+
                 // Set the re-enable time based on configured delay
                 double delaySeconds = ConfigManager.Instance.GetOverlayClearDelaySeconds();
                 _ocrReenableTime = DateTime.Now.AddSeconds(delaySeconds);
                 Console.WriteLine($"OCR disabled until {_ocrReenableTime:HH:mm:ss.fff} ({delaySeconds}s delay)");
-                
+
                 // Refresh overlays immediately and synchronously for instant visual update
                 if (System.Windows.Application.Current.Dispatcher.CheckAccess())
                 {
@@ -422,9 +422,9 @@ namespace UGTLive
                         RefreshMainWindowOverlays();
                     }, DispatcherPriority.Send);
                 }
-                
+
                 Console.WriteLine("Overlays cleared");
-                
+
                 // If OCR is active, trigger it again after configured delay
                 if (GetIsStarted())
                 {
@@ -444,24 +444,24 @@ namespace UGTLive
             HotkeyManager.Instance.OverlayModeToggleRequested += (s, e) => ToggleOverlayMode();
             HotkeyManager.Instance.OverlayModePreviousRequested += (s, e) => PreviousOverlayMode();
             HotkeyManager.Instance.SnapshotRequested += (s, e) => PerformSnapshot();
-            
+
             // Start gamepad manager
             GamepadManager.Instance.Start();
-            
+
             // Set up global keyboard hook to handle shortcuts even when console has focus
             KeyboardShortcuts.InitializeGlobalHook();
-            
+
             // Set up tooltip exclusion from screenshots
             SetupTooltipExclusion();
         }
-        
+
         // Setup tooltip exclusion from screenshots
         private void SetupTooltipExclusion()
         {
             // Use ToolTipService to add an event handler for when any tooltip opens
             this.AddHandler(ToolTipService.ToolTipOpeningEvent, new RoutedEventHandler(OnToolTipOpening));
         }
-        
+
         private void OnToolTipOpening(object sender, RoutedEventArgs e)
         {
             // Schedule exclusion check on next UI thread cycle (tooltip window needs to be created first)
@@ -470,35 +470,35 @@ namespace UGTLive
                 ExcludeTooltipFromCapture();
             }), DispatcherPriority.Background);
         }
-        
+
         private void ExcludeTooltipFromCapture()
         {
             try
             {
                 // Check if user wants windows visible in screenshots
                 bool visibleInScreenshots = ConfigManager.Instance.GetWindowsVisibleInScreenshots();
-                
+
                 // If visible in screenshots, don't exclude
                 if (visibleInScreenshots)
                 {
                     return;
                 }
-                
+
                 // Find all tooltip windows and exclude them
                 var tooltipWindows = System.Windows.Application.Current.Windows.OfType<Window>()
                     .Where(w => w.GetType().Name.Contains("ToolTip") || w.GetType().Name.Contains("Popup"));
-                
+
                 foreach (var window in tooltipWindows)
                 {
                     var helper = new WindowInteropHelper(window);
                     IntPtr hwnd = helper.Handle;
-                    
+
                     if (hwnd != IntPtr.Zero)
                     {
                         SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
                     }
                 }
-                
+
                 // Also try to find popup windows via interop
                 // WPF tooltips are displayed in Popup windows which are top-level HWND windows
                 var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
@@ -511,13 +511,13 @@ namespace UGTLive
                             var className = new StringBuilder(256);
                             GetClassName(hWnd, className, className.Capacity);
                             string cls = className.ToString();
-                            
+
                             // WPF tooltip windows typically have these class names
                             if (cls.Contains("Popup") || cls.Contains("ToolTip") || cls.Contains("HwndWrapper"))
                             {
                                 SetWindowDisplayAffinity(hWnd, WDA_EXCLUDEFROMCAPTURE);
                             }
-                            
+
                             return true; // Continue enumeration
                         }, IntPtr.Zero);
                     }
@@ -532,13 +532,13 @@ namespace UGTLive
                 Console.WriteLine($"Error excluding tooltip from capture: {ex.Message}");
             }
         }
-        
+
         [DllImport("user32.dll")]
         private static extern bool EnumThreadWindows(uint dwThreadId, EnumThreadDelegate lpfn, IntPtr lParam);
-        
+
         private delegate bool EnumThreadDelegate(IntPtr hWnd, IntPtr lParam);
-        
-       
+
+
         // add method for show/hide the main window
         private void ToggleMainWindowVisibility()
         {
@@ -555,7 +555,7 @@ namespace UGTLive
             }
 
         }
-        
+
         // Toggle passthrough mode
         private void TogglePassthrough()
         {
@@ -566,12 +566,12 @@ namespace UGTLive
                 Console.WriteLine($"Passthrough toggled: {(newState ? "enabled" : "disabled")}");
             }
         }
-        
+
         // Toggle overlay mode between Hide, Source, and Translated
         private void ToggleOverlayMode()
         {
             _updatingOverlayMode = true;
-            
+
             try
             {
                 if (_currentOverlayMode == OverlayMode.Hide)
@@ -589,7 +589,7 @@ namespace UGTLive
                     _currentOverlayMode = OverlayMode.Hide;
                     overlayHideRadio.IsChecked = true;
                 }
-                
+
                 // Save to config and update display
                 string mode = _currentOverlayMode switch
                 {
@@ -600,7 +600,7 @@ namespace UGTLive
                 };
                 ConfigManager.Instance.SetMainWindowOverlayMode(mode);
                 RefreshMainWindowOverlays();
-                
+
                 Console.WriteLine($"Overlay mode toggled to: {_currentOverlayMode}");
             }
             finally
@@ -608,12 +608,12 @@ namespace UGTLive
                 _updatingOverlayMode = false;
             }
         }
-        
+
         // Cycle overlay mode in reverse order: Translated -> Source -> Hide -> Translated
         private void PreviousOverlayMode()
         {
             _updatingOverlayMode = true;
-            
+
             try
             {
                 if (_currentOverlayMode == OverlayMode.Hide)
@@ -631,7 +631,7 @@ namespace UGTLive
                     _currentOverlayMode = OverlayMode.Source;
                     overlaySourceRadio.IsChecked = true;
                 }
-                
+
                 // Save to config and update display
                 string mode = _currentOverlayMode switch
                 {
@@ -642,7 +642,7 @@ namespace UGTLive
                 };
                 ConfigManager.Instance.SetMainWindowOverlayMode(mode);
                 RefreshMainWindowOverlays();
-                
+
                 Console.WriteLine($"Overlay mode previous to: {_currentOverlayMode}");
             }
             finally
@@ -650,13 +650,13 @@ namespace UGTLive
                 _updatingOverlayMode = false;
             }
         }
-        
+
         // Update tooltips with current hotkey bindings
         public void UpdateTooltips()
         {
             UpdateHotkeyTooltips();
         }
-        
+
         private void UpdateHotkeyTooltips()
         {
             // Helper function to get hotkey string for an action
@@ -665,7 +665,7 @@ namespace UGTLive
                 var bindings = HotkeyManager.Instance.GetBindings(actionId);
                 if (bindings.Count == 0)
                     return "";
-                    
+
                 List<string> parts = new List<string>();
                 foreach (var binding in bindings)
                 {
@@ -674,45 +674,45 @@ namespace UGTLive
                     if (binding.HasGamepadHotkey())
                         parts.Add($"Gamepad: {binding.GetGamepadHotkeyString()}");
                 }
-                    
+
                 return parts.Count > 0 ? $" ({string.Join(" or ", parts)})" : "";
             }
-            
+
             // Force close any currently open tooltips so they refresh with new content
             ToolTipService.SetIsEnabled(this, false);
             ToolTipService.SetIsEnabled(this, true);
-            
+
             // Update button tooltips
             if (toggleButton != null)
                 toggleButton.ToolTip = $"Start/Stop Live OCR{GetHotkeyString("start_stop")}";
-                
+
             if (monitorButton != null)
                 monitorButton.ToolTip = $"Toggle Monitor Window{GetHotkeyString("toggle_monitor")}";
-                
+
             if (chatBoxButton != null)
                 chatBoxButton.ToolTip = $"Toggle ChatBox{GetHotkeyString("toggle_chatbox")}";
-                
+
             if (settingsButton != null)
                 settingsButton.ToolTip = $"Toggle Settings{GetHotkeyString("toggle_settings")}";
-                
+
             if (logButton != null)
                 logButton.ToolTip = $"Toggle Log Console{GetHotkeyString("toggle_log")}";
-                
+
             if (listenButton != null)
                 listenButton.ToolTip = $"Toggle voice listening{GetHotkeyString("toggle_listen")}";
-                
+
             if (exportButton != null)
                 exportButton.ToolTip = $"View current capture in browser{GetHotkeyString("view_in_browser")}";
-                
+
             if (hideButton != null)
                 hideButton.ToolTip = $"Toggle Main Window{GetHotkeyString("toggle_main_window")}";
-                
+
             if (mousePassthroughCheckBox != null)
                 mousePassthroughCheckBox.ToolTip = $"Toggle mouse passthrough mode{GetHotkeyString("toggle_passthrough")}";
-            
+
             if (snapshotButton != null)
                 snapshotButton.ToolTip = $"Snapshot: Single OCR capture{GetHotkeyString("snapshot")}";
-            
+
             // Update overlay radio buttons
             string overlayHotkey = GetHotkeyString("toggle_overlay_mode");
             if (overlayHideRadio != null)
@@ -721,20 +721,20 @@ namespace UGTLive
                 overlaySourceRadio.ToolTip = $"Show source text{overlayHotkey}";
             if (overlayTranslatedRadio != null)
                 overlayTranslatedRadio.ToolTip = $"Show translated text{overlayHotkey}";
-            
+
             // Setup individual tooltip opened handlers for each control
             SetupIndividualTooltipHandlers();
         }
-        
+
         private void SetupIndividualTooltipHandlers()
         {
-            var controls = new FrameworkElement[] 
-            { 
-                toggleButton, snapshotButton, monitorButton, chatBoxButton, settingsButton, logButton, 
+            var controls = new FrameworkElement[]
+            {
+                toggleButton, snapshotButton, monitorButton, chatBoxButton, settingsButton, logButton,
                 listenButton, exportButton, hideButton, mousePassthroughCheckBox,
                 overlayHideRadio, overlaySourceRadio, overlayTranslatedRadio
             };
-            
+
             foreach (var control in controls)
             {
                 if (control != null)
@@ -773,7 +773,7 @@ namespace UGTLive
                 MinHeight = 16 // Ensure minimum height to prevent title bar collapse
             };
         }
-        
+
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // Restore window position if persistence is enabled
@@ -810,15 +810,15 @@ namespace UGTLive
 
             // Update tooltips with hotkeys
             UpdateHotkeyTooltips();
-            
+
             // Update capture rectangle
             UpdateCaptureRect();
-            
+
             // Subscribe to Play All state changes
             AudioPlaybackManager.Instance.PlayAllStateChanged += AudioPlaybackManager_PlayAllStateChanged;
             // Subscribe to current playing text object changes
             AudioPlaybackManager.Instance.CurrentPlayingTextObjectChanged += AudioPlaybackManager_CurrentPlayingTextObjectChanged;
-           
+
             // Add socket status to the header
             if (HeaderBorder != null && HeaderBorder.Child is Grid headerGrid)
             {
@@ -826,7 +826,7 @@ namespace UGTLive
                 var elements = headerGrid.Children;
                 foreach (var element in elements)
                 {
-                    if (element is StackPanel stackPanel && 
+                    if (element is StackPanel stackPanel &&
                         stackPanel.HorizontalAlignment == System.Windows.HorizontalAlignment.Left)
                     {
                         // Add socket status text to the stack panel
@@ -838,39 +838,42 @@ namespace UGTLive
                     }
                 }
             }
-            
-           
+
+
             // Load OCR method from config
             string savedOcrMethod = ConfigManager.Instance.GetOcrMethod();
             Console.WriteLine($"MainWindow_Loaded: Loading OCR method from config: '{savedOcrMethod}'");
-            
+
             // Set OCR method in this window (MainWindow)
             SetOcrMethod(savedOcrMethod);
-            
+
             // Subscribe to translation events
             Logic.Instance.TranslationCompleted += Logic_TranslationCompleted;
-            
+
             // Initialize monitor window position (but don't show it - defaults to off)
             if (!MonitorWindow.Instance.IsVisible)
             {
                 // Position to the right of the main window for initial positioning
                 PositionMonitorWindowToTheRight();
-                
+
                 // Consider this the initial position for the monitor window toggle
                 monitorWindowLeft = MonitorWindow.Instance.Left;
                 monitorWindowTop = MonitorWindow.Instance.Top;
-                
+
                 // Monitor window defaults to off (blue button)
                 monitorButton.Background = new SolidColorBrush(Color.FromRgb(69, 105, 176)); // Blue
             }
-            
+
             // Test configuration loading
             TestConfigLoading();
-            
+
             // Initialization is complete, now we can save settings changes
             _isInitializing = false;
             Console.WriteLine("MainWindow initialization complete. Settings changes will now be saved.");
-            
+
+            // Apply border color from config
+            ApplyBorderColor();
+
             // Force the OCR method to match the config again
             // This ensures the config value is preserved and not overwritten
             string configOcrMethod = ConfigManager.Instance.GetOcrMethod();
@@ -885,13 +888,13 @@ namespace UGTLive
 
             // Load language settings from config
             LoadLanguageSettingsFromConfig();
-            
+
             // Load auto-translate setting from config
             isAutoTranslateEnabled = ConfigManager.Instance.IsAutoTranslateEnabled();
-            
+
             // Initialize the overlay WebView2
             InitializeMainWindowOverlayWebView();
-            
+
             // Load overlay mode from config
             string overlayMode = ConfigManager.Instance.GetMainWindowOverlayMode();
             switch (overlayMode)
@@ -910,7 +913,7 @@ namespace UGTLive
                     overlayTranslatedRadio.IsChecked = true;
                     break;
             }
-            
+
             // Set initial mouse passthrough state (always unchecked at startup to avoid confusion)
             bool mousePassthrough = false;
             mousePassthroughCheckBox.IsChecked = mousePassthrough;
@@ -919,7 +922,7 @@ namespace UGTLive
             updateMousePassthrough(mousePassthrough);
             Console.WriteLine($"MainWindow mouse passthrough initialized: {(mousePassthrough ? "enabled" : "disabled")}");
         }
-        
+
         // Handler for application-level keyboard shortcuts
         private void Application_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -935,12 +938,12 @@ namespace UGTLive
                      var modifiers = System.Windows.Input.Keyboard.Modifiers;
                      HotkeyManager.Instance.HandleKeyDown(e.Key, modifiers);
                 }
-                
+
                 // Always suppress default Tab navigation on Main Window
                 e.Handled = true;
                 return;
             }
-            
+
             // Only process hotkeys at window level if global hotkeys are disabled
             // (When global hotkeys are enabled, the global hook handles them)
             if (!HotkeyManager.Instance.GetGlobalHotkeysEnabled())
@@ -948,14 +951,14 @@ namespace UGTLive
                 // Forward to the HotkeyManager
                 var modifiers = System.Windows.Input.Keyboard.Modifiers;
                 bool handled = HotkeyManager.Instance.HandleKeyDown(e.Key, modifiers);
-                
+
                 if (handled)
                 {
                     e.Handled = true;
                 }
             }
         }
-       
+
         private void TestConfigLoading()
         {
             try
@@ -965,19 +968,19 @@ namespace UGTLive
                 string llmPrompt = Logic.Instance.GetLlmPrompt();
                 string ocrMethod = ConfigManager.Instance.GetOcrMethod();
                 string translationService = ConfigManager.Instance.GetCurrentTranslationService();
-                
+
                 Console.WriteLine("=== Configuration Test ===");
                 Console.WriteLine($"API Key: {(string.IsNullOrEmpty(apiKey) ? "Not set" : "Set - " + apiKey.Substring(0, 4) + "...")}");
                 Console.WriteLine($"LLM Prompt: {(string.IsNullOrEmpty(llmPrompt) ? "Not set" : "Set - " + llmPrompt.Length + " chars")}");
                 Console.WriteLine($"OCR Method: {ocrMethod}");
                 Console.WriteLine($"Translation Service: {translationService}");
-                
+
                 if (!string.IsNullOrEmpty(llmPrompt))
                 {
                     Console.WriteLine("First 100 characters of LLM Prompt:");
                     Console.WriteLine(llmPrompt.Length > 100 ? llmPrompt.Substring(0, 100) + "..." : llmPrompt);
                 }
-                
+
                 Console.WriteLine("=========================");
             }
             catch (Exception ex)
@@ -985,7 +988,7 @@ namespace UGTLive
                 Console.WriteLine($"Error testing config: {ex.Message}");
             }
         }
-          
+
         private void UpdateCaptureRect()
         {
             // Retrieve the handle using WindowInteropHelper
@@ -1006,7 +1009,7 @@ namespace UGTLive
             {
                 customTitleBarHeight = (int)Math.Ceiling(TopControlGrid.ActualHeight);
             }
-            
+
             // Border thickness settings
             int leftBorderThickness = 9;  // Increased from 7 to 9
             int rightBorderThickness = 8; // Adjusted to 8
@@ -1022,18 +1025,18 @@ namespace UGTLive
                 windowRect.Top + customTitleBarHeight,
                 (windowRect.Right - windowRect.Left) - leftBorderThickness - rightBorderThickness,
                 (windowRect.Bottom - windowRect.Top) - customTitleBarHeight - bottomBorderThickness);
-                
+
             // If position changed and we have text objects, update their positions
-            if ((previousCaptureX != captureRect.Left || previousCaptureY != captureRect.Top) && 
+            if ((previousCaptureX != captureRect.Left || previousCaptureY != captureRect.Top) &&
                 Logic.Instance.TextObjects.Count > 0)
             {
                 // Calculate the offset
                 int offsetX = captureRect.Left - previousCaptureX;
                 int offsetY = captureRect.Top - previousCaptureY;
-                
+
                 // Apply offset to text objects
                 Logic.Instance.UpdateTextObjectPositions(offsetX, offsetY);
-                
+
                 if (ConfigManager.Instance.GetLogExtraDebugStuff())
                 {
                     Console.WriteLine($"Capture position changed by ({offsetX}, {offsetY}). Text overlays updated.");
@@ -1045,7 +1048,7 @@ namespace UGTLive
 
         private void OnUpdateTick(object? sender, EventArgs e)
         {
-          
+
             PerformCapture();
         }
 
@@ -1059,7 +1062,7 @@ namespace UGTLive
                 UpdateCaptureRect();
             }
         }
-       
+
         private void OnStartButtonToggleClicked(object sender, RoutedEventArgs e)
         {
             System.Windows.Controls.Button btn = (System.Windows.Controls.Button)sender;
@@ -1074,11 +1077,11 @@ namespace UGTLive
                 Logic.Instance.ClearAllTextObjects();
                 // Also hide the ChatBox "Waiting for translation" indicator (if visible)
                 ChatBoxWindow.Instance?.HideTranslationStatus();
-                
+
                 // Hide OCR status when stopping
                 Logic.Instance.HideOCRStatus();
                 HideTranslationStatus();
-                
+
                 // Optional: Add a way to clear overlays manually if needed
                 // You could add a separate "Clear" button or keyboard shortcut
             }
@@ -1088,16 +1091,16 @@ namespace UGTLive
                 Logic.Instance.ResetHash(); // Force new OCR analysis
                 Logic.Instance.ClearAllTextObjects();
                 MonitorWindow.Instance.RefreshOverlays();
-                
+
                 isStarted = true;
                 btn.Content = "Stop";
                 UpdateCaptureRect();
-                
+
                 // Clear any delay restriction when manually starting OCR
                 _ocrReenableTime = DateTime.MinValue;
                 SetOCRCheckIsWanted(true);
                 btn.Background = new SolidColorBrush(Color.FromRgb(220, 0, 0)); // Red
-                
+
                 // Show OCR status when starting (handled by Logic.cs)
             }
         }
@@ -1106,18 +1109,18 @@ namespace UGTLive
         {
             PerformSnapshot();
         }
-        
+
         // Perform a snapshot OCR capture
         private void PerformSnapshot()
         {
             Console.WriteLine($"Snapshot requested - _snapshotInProgress={_snapshotInProgress}, _isSnapshotOverlayDisplayed={_isSnapshotOverlayDisplayed}");
-            
+
             // If live mode is active, stop it first
             if (isStarted)
             {
                 OnStartButtonToggleClicked(toggleButton, new RoutedEventArgs());
             }
-            
+
             // Check if toggle mode is enabled and we should clear (either overlay displayed OR snapshot in progress)
             bool toggleMode = ConfigManager.Instance.GetSnapshotToggleMode();
             Console.WriteLine($"Toggle mode={toggleMode}, condition=({_isSnapshotOverlayDisplayed} || {_snapshotInProgress}) = {_isSnapshotOverlayDisplayed || _snapshotInProgress}");
@@ -1133,11 +1136,11 @@ namespace UGTLive
                 _lastOverlayHtml = string.Empty;
                 MonitorWindow.Instance.RefreshOverlays();
                 RefreshMainWindowOverlays();
-                
+
                 // Stop the translation status timer and hide ChatBox status
                 HideTranslationStatus();
                 ChatBoxWindow.Instance?.HideTranslationStatus();
-                
+
                 // Update status to show snapshot cleared (after HideTranslationStatus resets it)
                 if (translationStatusLabel != null)
                 {
@@ -1145,18 +1148,18 @@ namespace UGTLive
                 }
                 return;
             }
-            
+
             // If a snapshot is already in progress (and toggle mode is off), ignore this request
             if (_snapshotInProgress)
             {
                 Console.WriteLine("Snapshot already in progress, ignoring");
                 return;
             }
-            
+
             // Mark snapshot as in progress to prevent double-triggering
             _snapshotInProgress = true;
             _isSnapshotOverlayDisplayed = false; // Will be set true when results arrive
-            
+
             // Show snapshot status
             string ocrMethod = GetSelectedOcrMethod();
             if (translationStatusLabel != null)
@@ -1167,27 +1170,27 @@ namespace UGTLive
             {
                 translationStatusBorder.Visibility = Visibility.Visible;
             }
-            
+
             // Clear any existing overlays
             Logic.Instance.CancelTranslation();
             Logic.Instance.ClearAllTextObjects();
             _lastOverlayHtml = string.Empty;
             MonitorWindow.Instance.RefreshOverlays();
             RefreshMainWindowOverlays();
-            
+
             // Prepare Logic for snapshot mode (bypasses settling)
             Logic.Instance.PrepareSnapshotOCR();
-            
+
             // Clear any delay restriction
             _ocrReenableTime = DateTime.MinValue;
-            
+
             // Force OCR to run
             SetOCRCheckIsWanted(true);
-            
+
             // Trigger capture directly
             PerformSnapshotCapture();
         }
-        
+
         // Called by Logic when snapshot processing is complete (results displayed or failed)
         public void OnSnapshotComplete(bool success)
         {
@@ -1197,7 +1200,7 @@ namespace UGTLive
                 Console.WriteLine("Snapshot complete callback ignored - snapshot was already canceled");
                 return;
             }
-            
+
             _snapshotInProgress = false;
             if (success)
             {
@@ -1210,7 +1213,7 @@ namespace UGTLive
                 Console.WriteLine("Snapshot complete - failed or no results");
             }
         }
-        
+
         // Perform capture for snapshot mode (bypasses normal checks)
         private void PerformSnapshotCapture()
         {
@@ -1241,7 +1244,7 @@ namespace UGTLive
                     g.SmoothingMode = SmoothingMode.HighSpeed;
                     g.InterpolationMode = InterpolationMode.Low;
                     g.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-                   
+
                     try
                     {
                         g.CopyFromScreen(
@@ -1258,7 +1261,7 @@ namespace UGTLive
                         return;
                     }
                 }
-                
+
                 // Store the current capture coordinates for use with OCR results
                 Logic.Instance.SetCurrentCapturePosition(captureRect.Left, captureRect.Top);
 
@@ -1292,20 +1295,20 @@ namespace UGTLive
                 }
             }
         }
-        
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
-        
+
         // Button to show the window when it's hidden
         private System.Windows.Controls.Button? showButton;
-        
+
         private void HideButton_Click(object sender, RoutedEventArgs e)
         {
             // Hide the main window elements
             MainBorder.Visibility = Visibility.Collapsed;
-            
+
             // Create a small "Show" button that remains visible
             if (showButton == null)
             {
@@ -1326,22 +1329,22 @@ namespace UGTLive
                     // Make sure it receives all input events
                     IsHitTestVisible = true
                 };
-                
+
                 // Make button visible to WindowChrome
                 WindowChrome.SetIsHitTestVisibleInChrome(showButton, true);
-                
+
                 showButton.Click += ShowButton_Click;
-                
+
                 // Get the main grid
                 var mainGrid = this.Content as Grid;
                 if (mainGrid != null)
                 {
                     // Add the button as the last child (top-most)
                     mainGrid.Children.Add(showButton);
-                    
+
                     // Ensure it's on top by setting a high ZIndex
                     System.Windows.Controls.Panel.SetZIndex(showButton, 1000);
-                    
+
                     Console.WriteLine("Show button added to main grid");
                 }
                 else
@@ -1354,12 +1357,12 @@ namespace UGTLive
                 showButton.Visibility = Visibility.Visible;
             }
         }
-        
+
         private void ShowButton_Click(object sender, RoutedEventArgs e)
         {
             // Show the main window elements
             MainBorder.Visibility = Visibility.Visible;
-            
+
             // Hide the show button
             if (showButton != null)
             {
@@ -1368,7 +1371,7 @@ namespace UGTLive
         }
 
         private bool _isShuttingDown = false;
-        
+
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             // If we're already shutting down, allow the close
@@ -1377,28 +1380,28 @@ namespace UGTLive
                 base.OnClosing(e);
                 return;
             }
-            
+
             // Cancel the close for now
             e.Cancel = true;
-            
+
             // Close Monitor window immediately before showing shutdown dialog
             if (MonitorWindow.Instance.IsVisible)
             {
                 MonitorWindow.Instance.ForceClose();
             }
-            
+
             // Show shutdown dialog
             ShutdownDialog shutdownDialog = new ShutdownDialog();
             shutdownDialog.Show();
             shutdownDialog.UpdateStatus("Closing connections...");
-            
+
             // Process UI messages to ensure dialog is visible
             System.Windows.Application.Current.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
-            
+
             // Perform shutdown operations
             PerformShutdown(shutdownDialog);
         }
-        
+
         private async void PerformShutdown(ShutdownDialog shutdownDialog)
         {
             try
@@ -1408,43 +1411,43 @@ namespace UGTLive
                 {
                     shutdownDialog.UpdateStatus("Stopping OCR...");
                     await Task.Delay(50);
-                    
+
                     Logic.Instance.ResetHash();
                     isStarted = false;
                     ChatBoxWindow.Instance?.HideTranslationStatus();
                     Logic.Instance.HideOCRStatus();
                     HideTranslationStatus();
                 }
-                
+
                 // Remove global keyboard hook
                 shutdownDialog.UpdateStatus("Closing connections...");
                 await Task.Delay(50); // Small delay to allow UI update
                 KeyboardShortcuts.CleanupGlobalHook();
-                
+
                 shutdownDialog.UpdateStatus("Cleaning up resources...");
                 await Task.Delay(50);
                 MouseManager.Instance.Cleanup();
-                
+
                 shutdownDialog.UpdateStatus("Stopping services...");
                 await Task.Delay(50);
                 await Logic.Instance.Finish();
-                
+
                 // Note: Logic.Finish() already stops Python services via PythonServicesManager
                 // No need for additional server cleanup
-                
+
                 // Make sure the console is closed
                 if (consoleWindow != IntPtr.Zero)
                 {
                     ShowWindow(consoleWindow, SW_HIDE);
                 }
-                
+
                 // Close shutdown dialog
                 shutdownDialog.Close();
-                
+
                 // Mark as shutting down and close the window
                 _isShuttingDown = true;
                 this.Close();
-                
+
                 // Make sure the application exits
                 System.Windows.Application.Current.Shutdown();
             }
@@ -1457,12 +1460,12 @@ namespace UGTLive
                 System.Windows.Application.Current.Shutdown();
             }
         }
-        
+
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
         }
-        
+
         // Settings button toggle handler
         private void PlayAllAudioButton_Click(object sender, RoutedEventArgs e)
         {
@@ -1474,7 +1477,7 @@ namespace UGTLive
                     AudioPlaybackManager.Instance.StopCurrentPlayback();
                     return;
                 }
-                
+
                 var textObjects = Logic.Instance?.GetTextObjects();
                 if (textObjects == null || textObjects.Count == 0)
                 {
@@ -1487,14 +1490,14 @@ namespace UGTLive
                     }
                     return;
                 }
-                
+
                 // Determine which audio to play based on overlay mode
                 string overlayMode = ConfigManager.Instance.GetMainWindowOverlayMode();
                 bool useSourceAudio = overlayMode != "Translated";
-                
+
                 // Get play order setting
                 string playOrder = ConfigManager.Instance.GetTtsPlayOrder();
-                
+
                 // Play all audio
                 _ = AudioPlaybackManager.Instance.PlayAllAudioAsync(textObjects.ToList(), playOrder, useSourceAudio);
             }
@@ -1503,7 +1506,7 @@ namespace UGTLive
                 Console.WriteLine($"Error in PlayAllAudioButton_Click: {ex.Message}");
             }
         }
-        
+
         private void AudioPlaybackManager_PlayAllStateChanged(object? sender, bool isPlaying)
         {
             try
@@ -1543,7 +1546,7 @@ namespace UGTLive
                 Console.WriteLine($"Error updating Play All button: {ex.Message}");
             }
         }
-        
+
         private void AudioPlaybackManager_CurrentPlayingTextObjectChanged(object? sender, string? textObjectId)
         {
             try
@@ -1581,7 +1584,7 @@ namespace UGTLive
                 Console.WriteLine($"Error updating playing icon: {ex.Message}");
             }
         }
-        
+
         public void UpdateAudioReadyState(string textObjectId, bool isSourceUpdate, string audioPath)
         {
             try
@@ -1597,14 +1600,14 @@ namespace UGTLive
                 {
                      var textObjects = Logic.Instance?.GetTextObjects();
                      var textObj = textObjects?.FirstOrDefault(t => t.ID == textObjectId);
-                     
+
                      if (textObj == null) return;
-                     
+
                      bool isTranslated = _currentOverlayMode == OverlayMode.Translated && !string.IsNullOrEmpty(textObj.TextTranslated);
-                     
+
                      bool audioIsReady = false;
                      bool isSourceForClick = true;
-                     
+
                      if (isTranslated)
                      {
                          if (textObj.TargetAudioReady && !string.IsNullOrEmpty(textObj.TargetAudioFilePath))
@@ -1625,14 +1628,14 @@ namespace UGTLive
                              isSourceForClick = true;
                          }
                      }
-                     
+
                      string iconReady = ConfigManager.ICON_SPEAKER_READY;
                      string iconNotReady = ConfigManager.ICON_SPEAKER_NOT_READY;
-                     
+
                      // Escape backslashes for JavaScript string
                      string escapedAudioPath = audioPath.Replace("\\", "\\\\").Replace("'", "\\'");
                      string script = $"setAudioState('{textObjectId}', {audioIsReady.ToString().ToLower()}, {isSourceForClick.ToString().ToLower()}, '{escapedAudioPath}', {isSourceUpdate.ToString().ToLower()}, '{iconReady}', '{iconNotReady}');";
-                     
+
                      textOverlayWebView.CoreWebView2.ExecuteScriptAsync(script);
                 }
             }
@@ -1646,25 +1649,25 @@ namespace UGTLive
         {
             ToggleSettingsWindow();
         }
-        
+
         // Remember the settings window position
         private double settingsWindowLeft = -1;
         private double settingsWindowTop = -1;
-        
+
         // Show/hide the settings window
         private void ToggleSettingsWindow()
         {
             var settingsWindow = SettingsWindow.Instance;
-            
+
             // Check if settings window is visible and not minimized
             if (settingsWindow.IsVisible && settingsWindow.WindowState != WindowState.Minimized)
             {
                 // Store current position before hiding
                 settingsWindowLeft = settingsWindow.Left;
                 settingsWindowTop = settingsWindow.Top;
-                
+
                 Console.WriteLine($"Saving settings position: {settingsWindowLeft}, {settingsWindowTop}");
-                
+
                 settingsWindow.Hide();
                 // Re-enable hotkeys now that the Settings window is hidden
                 HotkeyManager.Instance.SetEnabled(true);
@@ -1686,7 +1689,7 @@ namespace UGTLive
                     // Position to the right of the main window for first run
                     double mainRight = this.Left + this.ActualWidth;
                     double mainTop = this.Top;
-                    
+
                     settingsWindow.Left = mainRight + 10; // 10px gap
                     settingsWindow.Top = mainTop;
                     if (ConfigManager.Instance.GetLogExtraDebugStuff())
@@ -1694,23 +1697,23 @@ namespace UGTLive
                         Console.WriteLine("No saved position, positioning settings window to the right");
                     }
                 }
-                
+
                 // Ensure window is not minimized
                 if (settingsWindow.WindowState == WindowState.Minimized)
                 {
                     settingsWindow.WindowState = WindowState.Normal;
                 }
-                
+
                 // Set MainWindow as owner to ensure Settings window appears above it
                 settingsWindow.Owner = this;
                 settingsWindow.Show();
-                
+
                 // Ensure window is visible, on top, and activated
                 settingsWindow.Visibility = Visibility.Visible;
                 settingsWindow.Activate();
                 settingsWindow.Focus();
                 settingsWindow.BringIntoView();
-                
+
                 // Disable hotkeys while the Settings window is active so we can type normally
                 HotkeyManager.Instance.SetEnabled(false);
                 if (ConfigManager.Instance.GetLogExtraDebugStuff())
@@ -1744,7 +1747,7 @@ namespace UGTLive
                     g.SmoothingMode = SmoothingMode.HighSpeed;
                     g.InterpolationMode = InterpolationMode.Low;
                     g.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-                   
+
                     try
                     {
                         g.CopyFromScreen(
@@ -1753,16 +1756,16 @@ namespace UGTLive
                             0, 0,
                             bitmap.Size,
                             CopyPixelOperation.SourceCopy);
-                      
+
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Error during screen capture: {ex.Message}");
                         Console.WriteLine($"Stack trace: {ex.StackTrace}");
                     }
-                      
+
                 }
-                
+
                 // Store the current capture coordinates for use with OCR results
                 Logic.Instance.SetCurrentCapturePosition(captureRect.Left, captureRect.Top);
 
@@ -1773,7 +1776,7 @@ namespace UGTLive
                     // Always update, even when not visible, so "View in browser" has the latest image
                     MonitorWindow.Instance.UpdateScreenshotFromBitmap(bitmap, showWindow: false);
 
-                    //do we actually want to do OCR right now?  
+                    //do we actually want to do OCR right now?
                     if (!GetIsStarted()) return;
 
                     if (!GetOCRCheckIsWanted())
@@ -1785,7 +1788,7 @@ namespace UGTLive
                     stopwatch.Start();
 
                     SetOCRCheckIsWanted(false);
-                    
+
                     // OCR timing is now tracked in Logic.cs via NotifyOCRCompleted()
 
                     // Save image for debugging if enabled
@@ -1834,12 +1837,12 @@ namespace UGTLive
             }
 
         }
-        
+
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
         }
-        
+
         private void AutoTranslateCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
         {
             // Convert sender to CheckBox
@@ -1856,7 +1859,7 @@ namespace UGTLive
                 MonitorWindow.Instance.RefreshOverlays();
             }
         }
-        
+
 
         private void OcrMethodComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -1864,17 +1867,17 @@ namespace UGTLive
             {
                 // Get internal ID from Tag property
                 string? ocrMethod = (comboBox.SelectedItem as System.Windows.Controls.ComboBoxItem)?.Tag?.ToString();
-                
+
                 if (!string.IsNullOrEmpty(ocrMethod))
                 {
                     // Reset the OCR hash to force a fresh comparison after changing OCR method
                     Logic.Instance.ResetHash();
-                    
+
                     Console.WriteLine($"OCR method changed to: {ocrMethod}");
-                    
+
                     // Clear any existing text objects
                     Logic.Instance.ClearAllTextObjects();
-                    
+
                     // Update the UI based on the selected OCR method
                     if (ocrMethod == "Windows OCR")
                     {
@@ -1896,19 +1899,19 @@ namespace UGTLive
                 }
             }
         }
-        
+
         // Keep track of selected OCR method
         private string selectedOcrMethod = "Windows OCR";
-        
+
         public string GetSelectedOcrMethod()
         {
             return selectedOcrMethod;
         }
-        
+
         // Track overlay mode for MainWindow
         private OverlayMode _currentOverlayMode = OverlayMode.Translated; // Default to Translated
         private bool _updatingOverlayMode = false; // Flag to prevent event recursion
-        
+
         // Public getter for overlay mode
         public OverlayMode GetOverlayMode()
         {
@@ -1926,26 +1929,26 @@ namespace UGTLive
             Console.WriteLine("[MAINWINDOW] ClearMainWindowOverlayCache called - forcing HTML regeneration");
             _lastOverlayHtml = string.Empty;
         }
-        
+
         // Win32 API for WDA_EXCLUDEFROMCAPTURE
         [DllImport("user32.dll")]
         private static extern bool SetWindowDisplayAffinity(IntPtr hwnd, uint dwAffinity);
-        
+
         private const uint WDA_NONE = 0x00000000;
         private const uint WDA_EXCLUDEFROMCAPTURE = 0x00000011;
-       
+
         // Toggle the monitor window
         private void MonitorButton_Click(object sender, RoutedEventArgs e)
         {
             ToggleMonitorWindow();
         }
-        
+
         // Handler for the Log button click
         private void LogButton_Click(object sender, RoutedEventArgs e)
         {
             toggleLogWindow();
         }
-        
+
         // Toggle log window visibility
         private void toggleLogWindow()
         {
@@ -1964,27 +1967,27 @@ namespace UGTLive
                 logButton.Background = new SolidColorBrush(Color.FromRgb(176, 69, 153)); // Pink/Red
             }
         }
-        
+
         // Update log button state (called from LogWindow when it's closed)
         public void updateLogButtonState(bool isVisible)
         {
-            logButton.Background = isVisible 
+            logButton.Background = isVisible
                 ? new SolidColorBrush(Color.FromRgb(176, 69, 153)) // Pink/Red - visible
                 : new SolidColorBrush(Color.FromRgb(153, 69, 176)); // Purple - hidden
         }
-        
+
         // Initialize console window with proper encoding and font
         private void InitializeConsole()
         {
             AllocConsole();
-            
+
             // Disable console input to prevent the app from freezing
             DisableConsoleInput();
-            
+
             // Set Windows console code page to UTF-8 (65001)
             SetConsoleCP(65001);
             SetConsoleOutputCP(65001);
-            
+
             // Set up a proper font for Japanese characters
             IntPtr hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
             CONSOLE_FONT_INFOEX fontInfo = new CONSOLE_FONT_INFOEX();
@@ -1994,11 +1997,11 @@ namespace UGTLive
             fontInfo.FontWeight = 400; // Normal weight
             fontInfo.dwFontSize = new COORD { X = 0, Y = 16 }; // Font size
             SetCurrentConsoleFontEx(hConsoleOutput, false, ref fontInfo);
-            
+
             // Set .NET console encoding to UTF-8
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
-            
+
             // Redirect standard output to the console with UTF-8 encoding
             // Only set if LogWindow hasn't already set up console redirection
             if (!(Console.Out is MultiTextWriter))
@@ -2010,7 +2013,7 @@ namespace UGTLive
                 Console.SetOut(standardOutput);
             }
         }
-        
+
         // Disable console input to prevent app freezing when focus is in the console
         private void DisableConsoleInput()
         {
@@ -2023,7 +2026,7 @@ namespace UGTLive
                     Console.WriteLine("Error getting console input handle");
                     return;
                 }
-                
+
                 // Get current console mode
                 uint mode;
                 if (!GetConsoleMode(hStdIn, out mode))
@@ -2031,17 +2034,17 @@ namespace UGTLive
                     Console.WriteLine($"Error getting console mode: {Marshal.GetLastWin32Error()}");
                     return;
                 }
-                
+
                 // CRITICAL: Disable QuickEdit mode to prevent console from blocking when user selects text
                 // QuickEdit mode causes the entire app to freeze when text is selected in the console
                 // We must use ENABLE_EXTENDED_FLAGS and explicitly turn off ENABLE_QUICK_EDIT_MODE
                 uint newMode = ENABLE_EXTENDED_FLAGS;
-                
+
                 // Remove QuickEdit and mouse input from the mode
                 newMode &= ~ENABLE_QUICK_EDIT_MODE;
                 newMode &= ~ENABLE_MOUSE_INPUT;
                 newMode &= ~ENABLE_INSERT_MODE;
-                
+
                 if (!SetConsoleMode(hStdIn, newMode))
                 {
                     Console.WriteLine($"Error setting console mode: {Marshal.GetLastWin32Error()}");
@@ -2053,23 +2056,23 @@ namespace UGTLive
                 Console.WriteLine($"Error disabling console input: {ex.Message}");
             }
         }
-        
+
         // Position the monitor window to the right of the main window
         private void PositionMonitorWindowToTheRight()
         {
             // Get the position of the main window
             double mainRight = this.Left + this.ActualWidth;
             double mainTop = this.Top;
-            
+
             // Set the position of the monitor window
             MonitorWindow.Instance.Left = mainRight + 10; // 10px gap between windows
             MonitorWindow.Instance.Top = mainTop;
         }
-        
+
         // Remember the monitor window position
         private double monitorWindowLeft = -1;
         private double monitorWindowTop = -1;
-        
+
         // Show/hide the monitor window
         private void ToggleMonitorWindow()
         {
@@ -2078,9 +2081,9 @@ namespace UGTLive
                 // Store current position before hiding
                 monitorWindowLeft = MonitorWindow.Instance.Left;
                 monitorWindowTop = MonitorWindow.Instance.Top;
-                
+
                 Console.WriteLine($"Saving monitor position: {monitorWindowLeft}, {monitorWindowTop}");
-                
+
                 MonitorWindow.Instance.Hide();
                 Console.WriteLine("Monitor window hidden from MainWindow toggle");
                 monitorButton.Background = new SolidColorBrush(Color.FromRgb(69, 105, 176)); // Blue
@@ -2103,7 +2106,7 @@ namespace UGTLive
                     PositionMonitorWindowToTheRight();
                     Console.WriteLine("No saved position, positioning monitor window to the right");
                 }
-                
+
                 // Set MainWindow as owner to ensure Monitor window appears above it
                 MonitorWindow.Instance.Owner = this;
                 MonitorWindow.Instance.Show();
@@ -2112,7 +2115,7 @@ namespace UGTLive
                     Console.WriteLine($"Monitor window shown at position {MonitorWindow.Instance.Left}, {MonitorWindow.Instance.Top}");
                 }
                 monitorButton.Background = new SolidColorBrush(Color.FromRgb(176, 69, 69)); // Red
-                
+
                 // If we have a recent screenshot, load it
                 if (File.Exists(outputPath))
                 {
@@ -2121,13 +2124,13 @@ namespace UGTLive
                 }
             }
         }
-        
+
         // ChatBox Button click handler
         private void ChatBoxButton_Click(object sender, RoutedEventArgs e)
         {
             ToggleChatBox();
         }
-        
+
         // Toggle ChatBox visibility and position
         private void ToggleChatBox()
         {
@@ -2136,7 +2139,7 @@ namespace UGTLive
                 // Cancel the selection mode if already selecting
                 isSelectingChatBoxArea = false;
                 chatBoxButton.Background = new SolidColorBrush(Color.FromRgb(69, 105, 176)); // Blue
-                
+
                 // Find and close any existing selector window
                 foreach (Window window in System.Windows.Application.Current.Windows)
                 {
@@ -2148,18 +2151,18 @@ namespace UGTLive
                 }
                 return;
             }
-            
+
             // ChatBoxWindow.Instance is always available, but may not be visible
             // Make sure our chatBoxWindow reference is up to date
             chatBoxWindow = ChatBoxWindow.Instance;
-            
+
             if (isChatBoxVisible && chatBoxWindow != null)
             {
                 // Hide ChatBox
                 chatBoxWindow.Hide();
                 isChatBoxVisible = false;
                 chatBoxButton.Background = new SolidColorBrush(Color.FromRgb(69, 105, 176)); // Blue
-                
+
                 // Don't set chatBoxWindow to null here - we're just hiding it, not closing it
             }
             else
@@ -2167,7 +2170,7 @@ namespace UGTLive
                 // Show selector to allow user to position ChatBox
                 ChatBoxSelectorWindow selectorWindow = ChatBoxSelectorWindow.GetInstance();
                 selectorWindow.SelectionComplete += ChatBoxSelector_SelectionComplete;
-                selectorWindow.Closed += (s, e) => 
+                selectorWindow.Closed += (s, e) =>
                 {
                     isSelectingChatBoxArea = false;
                     // Only set button to blue if the ChatBox isn't visible (was cancelled)
@@ -2179,19 +2182,19 @@ namespace UGTLive
                 // Set MainWindow as owner to ensure selector window appears above it
                 selectorWindow.Owner = this;
                 selectorWindow.Show();
-                
+
                 // Set button to red while selector is active
                 isSelectingChatBoxArea = true;
                 chatBoxButton.Background = new SolidColorBrush(Color.FromRgb(176, 69, 69)); // Red
             }
         }
-        
+
         // Handle selection completion
         private void ChatBoxSelector_SelectionComplete(object? sender, Rect selectionRect)
         {
             // Use the existing ChatBoxWindow.Instance
             chatBoxWindow = ChatBoxWindow.Instance;
-            
+
             // Check if event handlers are already attached
             if (!_chatBoxEventsAttached && chatBoxWindow != null)
             {
@@ -2201,7 +2204,7 @@ namespace UGTLive
                     isChatBoxVisible = false;
                     chatBoxButton.Background = new SolidColorBrush(Color.FromRgb(69, 105, 176)); // Blue
                 };
-                
+
                 // Also handle visibility changes for when the X button is clicked (which now hides instead of closes)
                 chatBoxWindow.IsVisibleChanged += (s, e) =>
                 {
@@ -2211,23 +2214,23 @@ namespace UGTLive
                         chatBoxButton.Background = new SolidColorBrush(Color.FromRgb(69, 105, 176)); // Blue
                     }
                 };
-                
+
                 _chatBoxEventsAttached = true;
             }
-            
+
             // Position and size the ChatBox
             chatBoxWindow!.Left = selectionRect.Left;
             chatBoxWindow.Top = selectionRect.Top;
             chatBoxWindow.Width = selectionRect.Width;
             chatBoxWindow.Height = selectionRect.Height;
-            
+
             // Show the ChatBox
             // Set MainWindow as owner to ensure ChatBox window appears above it
             chatBoxWindow.Owner = this;
             chatBoxWindow.Show();
             isChatBoxVisible = true;
             chatBoxButton.Background = new SolidColorBrush(Color.FromRgb(176, 69, 69)); // Red when active
-            
+
             // The ChatBox will get its data from MainWindow.GetTranslationHistory()
             // No need to manually load entries, just trigger an update
             if (chatBoxWindow != null)
@@ -2236,7 +2239,7 @@ namespace UGTLive
                 chatBoxWindow.UpdateChatHistory();
             }
         }
-        
+
         // **** MODIFIED: Returns the ID of the added/updated entry ****
         public string AddTranslationToHistory(string originalText, string translatedText)
         {
@@ -2250,7 +2253,7 @@ namespace UGTLive
                 if (_translationHistory.Count > 0 && !string.IsNullOrEmpty(translatedText))
                 {
                     var lastEntry = _translationHistory[_translationHistory.Count - 1]; // More direct access with List
-                    
+
                     // Check if original texts match (case-insensitive, trimmed)
                     if (string.Equals(lastEntry.OriginalText?.Trim(), originalText?.Trim(), StringComparison.OrdinalIgnoreCase))
                     {
@@ -2312,10 +2315,10 @@ namespace UGTLive
             {
                 Console.WriteLine($"Error adding/updating translation history: {ex.Message}");
             }
-            
+
             return entryId; // Return the ID of the added or updated entry
         }
-        
+
         // **** NEW: Method to update a specific entry by ID ****
         public void UpdateTranslationInHistory(string id, string newTranslatedText)
         {
@@ -2357,7 +2360,7 @@ namespace UGTLive
         {
             AddTranslationToHistory(e.OriginalText, e.TranslatedText);
         }
-        
+
         // Load language settings from config (no UI updates needed, ConfigManager handles everything)
         private void LoadLanguageSettingsFromConfig()
         {
@@ -2365,7 +2368,7 @@ namespace UGTLive
             {
                 string savedSourceLanguage = ConfigManager.Instance.GetSourceLanguage();
                 string savedTargetLanguage = ConfigManager.Instance.GetTargetLanguage();
-                
+
                 Console.WriteLine($"Loaded languages from config - Source: {savedSourceLanguage}, Target: {savedTargetLanguage}");
             }
             catch (Exception ex)
@@ -2402,13 +2405,13 @@ namespace UGTLive
 
                 if (openAIRealtimeAudioService == null)
                     openAIRealtimeAudioService = new OpenAIRealtimeAudioServiceWhisper();
-                
+
                 // Start the realtime audio service using loopback capture to record system audio
                 // **** MODIFIED: Pass new callbacks ****
                 openAIRealtimeAudioService.StartRealtimeAudioService(
-                    OnOpenAITranscriptReceived_Initial, 
-                    OnOpenAITranslationUpdate_WithId, 
-                    false); 
+                    OnOpenAITranscriptReceived_Initial,
+                    OnOpenAITranslationUpdate_WithId,
+                    false);
             }
         }
 
@@ -2427,7 +2430,7 @@ namespace UGTLive
             });
             return idToReturn; // Return the ID
         }
-        
+
         // **** NEW: Callback to handle translation updates via ID ****
         private void OnOpenAITranslationUpdate_WithId(string lineId, string originalText, string translatedText)
         {
@@ -2445,28 +2448,28 @@ namespace UGTLive
                 UpdateTranslationInHistory(lineId, translatedWithIcon);
             });
         }
-        
+
         // Initialize the overlay WebView2 for MainWindow
         private async void InitializeMainWindowOverlayWebView()
         {
             try
             {
                 var environment = await WebViewEnvironmentManager.GetEnvironmentAsync();
-                
+
                 // CRITICAL: Set WebView2 background to transparent BEFORE initializing
                 textOverlayWebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
-                
+
                 await textOverlayWebView.EnsureCoreWebView2Async(environment);
-                
+
                 if (textOverlayWebView.CoreWebView2 != null)
                 {
-                    
+
                     textOverlayWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-                    
+
                     textOverlayWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
                     textOverlayWebView.CoreWebView2.Settings.IsZoomControlEnabled = false;
                     textOverlayWebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
-                    
+
                     // Set interaction state based on current passthrough setting
                     bool mousePassthrough = ConfigManager.Instance.GetMainWindowMousePassthrough();
                     bool canInteract = !mousePassthrough;
@@ -2475,16 +2478,16 @@ namespace UGTLive
                     {
                         Console.WriteLine($"MainWindow text interaction initialized: {(canInteract ? "enabled" : "disabled (click-through)")}");
                     }
-                    
+
                     // Add event handlers for context menu
                     textOverlayWebView.CoreWebView2.WebMessageReceived += MainWindowOverlayWebView_WebMessageReceived;
                     textOverlayWebView.CoreWebView2.ContextMenuRequested += MainWindowOverlayWebView_ContextMenuRequested;
-                    
+
                     _overlayWebViewInitialized = true;
-                    
+
                     // Initial empty render
                     UpdateMainWindowOverlayWebView();
-                    
+
                     // Exclude WebView2 from capture - use a longer delay to ensure child windows are fully created
                     _ = Task.Delay(1500).ContinueWith(_ =>
                     {
@@ -2493,7 +2496,7 @@ namespace UGTLive
                             SetWebViewExcludeFromCapture();
                         });
                     });
-                    
+
                     Console.WriteLine("MainWindow overlay WebView2 initialized successfully");
                 }
             }
@@ -2502,14 +2505,14 @@ namespace UGTLive
                 Console.WriteLine($"Error initializing MainWindow overlay WebView2: {ex.Message}");
             }
         }
-        
+
         private void SetWebViewExcludeFromCapture()
         {
             try
             {
                 // Check if user wants windows visible in screenshots
                 bool visibleInScreenshots = ConfigManager.Instance.GetWindowsVisibleInScreenshots();
-                
+
                 if (textOverlayWebView?.CoreWebView2 != null)
                 {
                     // WebView2 is based on Chromium and doesn't create traditional Win32 child windows
@@ -2518,12 +2521,12 @@ namespace UGTLive
                     if (presentationSource is HwndSource hwndSource)
                     {
                         IntPtr webViewHwnd = hwndSource.Handle;
-                        
+
                         if (webViewHwnd != IntPtr.Zero)
                         {
                             uint affinity = visibleInScreenshots ? WDA_NONE : WDA_EXCLUDEFROMCAPTURE;
                             bool success = SetWindowDisplayAffinity(webViewHwnd, affinity);
-                            
+
                             if (success)
                             {
                                 Console.WriteLine($"MainWindow WebView2 excluded from screen capture successfully (HWND: {webViewHwnd})");
@@ -2551,20 +2554,20 @@ namespace UGTLive
                 Console.WriteLine($"Error setting MainWindow WebView2 capture mode: {ex.Message}");
             }
         }
-        
+
         private void ExcludeContextMenuFromCapture(System.Windows.Controls.ContextMenu contextMenu)
         {
             try
             {
                 // Check if user wants windows visible in screenshots
                 bool visibleInScreenshots = ConfigManager.Instance.GetWindowsVisibleInScreenshots();
-                
+
                 // If visible in screenshots, don't exclude
                 if (visibleInScreenshots)
                 {
                     return;
                 }
-                
+
                 // Use Dispatcher.BeginInvoke with a small delay to allow the popup window to be created
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
@@ -2575,11 +2578,11 @@ namespace UGTLive
                         if (presentationSource is HwndSource hwndSource)
                         {
                             IntPtr popupHwnd = hwndSource.Handle;
-                            
+
                             if (popupHwnd != IntPtr.Zero)
                             {
                                 bool success = SetWindowDisplayAffinity(popupHwnd, WDA_EXCLUDEFROMCAPTURE);
-                                
+
                                 if (success)
                                 {
                                     Console.WriteLine($"Context menu popup excluded from screen capture successfully (HWND: {popupHwnd})");
@@ -2611,7 +2614,7 @@ namespace UGTLive
                 Console.WriteLine($"Error setting up context menu exclusion: {ex.Message}");
             }
         }
-        
+
         private void TryFindAndExcludePopupWindow()
         {
             try
@@ -2619,23 +2622,23 @@ namespace UGTLive
                 // Get the main window's HWND
                 var helper = new WindowInteropHelper(this);
                 IntPtr mainHwnd = helper.Handle;
-                
+
                 if (mainHwnd == IntPtr.Zero)
                 {
                     return;
                 }
-                
+
                 // Try to find popup windows by enumerating child windows
                 // WPF ContextMenu popups are typically top-level windows, not children
                 // But we can try to find them by looking for windows with menu class names
                 IntPtr foundPopup = IntPtr.Zero;
-                
+
                 // Look for popup windows by checking child windows
                 EnumChildWindows(mainHwnd, (hWnd, lParam) =>
                 {
                     StringBuilder className = new StringBuilder(256);
                     GetClassName(hWnd, className, className.Capacity);
-                    
+
                     // WPF popup windows might have class names like "#32768" (menu class) or other popup classes
                     string classNameStr = className.ToString();
                     if (classNameStr.Contains("Popup") || classNameStr == "#32768" || classNameStr.Contains("Menu"))
@@ -2643,10 +2646,10 @@ namespace UGTLive
                         foundPopup = hWnd;
                         return false; // Stop enumeration
                     }
-                    
+
                     return true; // Continue enumeration
                 }, IntPtr.Zero);
-                
+
                 if (foundPopup != IntPtr.Zero)
                 {
                     bool success = SetWindowDisplayAffinity(foundPopup, WDA_EXCLUDEFROMCAPTURE);
@@ -2661,35 +2664,35 @@ namespace UGTLive
                 Console.WriteLine($"Error finding popup window: {ex.Message}");
             }
         }
-        
+
         // Win32 API for finding popup windows
         [DllImport("user32.dll")]
         private static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
-        
+
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
-        
+
         private const uint GW_CHILD = 5;
         private const uint GW_HWNDNEXT = 2;
-        
+
         // Win32 API for enumerating child windows
         [DllImport("user32.dll")]
         private static extern bool EnumChildWindows(IntPtr hWndParent, EnumWindowsProc lpEnumFunc, IntPtr lParam);
-        
+
         private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-        
+
         public void UpdateCaptureExclusion()
         {
             // Update the WebView2 child windows
             SetWebViewExcludeFromCapture();
         }
-        
+
         public void UpdateMainWindowTextInteraction()
         {
             // Update the IsHitTestVisible property based on passthrough state (inverse relationship)
             bool mousePassthrough = ConfigManager.Instance.GetMainWindowMousePassthrough();
             bool canInteract = !mousePassthrough;
-            
+
             if (textOverlayWebView != null)
             {
                 textOverlayWebView.IsHitTestVisible = canInteract;
@@ -2698,28 +2701,28 @@ namespace UGTLive
                     Console.WriteLine($"MainWindow text interaction: {(canInteract ? "enabled" : "disabled (click-through)")}");
                 }
             }
-            
+
             // Regenerate overlay HTML with updated interaction settings
             RefreshMainWindowOverlays();
         }
-        
+
         private void UpdateMainWindowOverlayWebView()
         {
             if (!_overlayWebViewInitialized || textOverlayWebView?.CoreWebView2 == null)
             {
                 return;
             }
-            
+
             try
             {
                 string html = GenerateMainWindowOverlayHtml();
-                
+
                 // Only update if HTML changed
                 if (html == _lastOverlayHtml)
                 {
                     return;
                 }
-                
+
                 _lastOverlayHtml = html;
                 textOverlayWebView.CoreWebView2.NavigateToString(html);
             }
@@ -2728,13 +2731,13 @@ namespace UGTLive
                 Console.WriteLine($"Error updating MainWindow overlay WebView: {ex.Message}");
             }
         }
-        
+
         private string GenerateMainWindowOverlayHtml()
         {
             // Check if click-through is enabled based on passthrough state (inverse relationship)
             bool mousePassthrough = ConfigManager.Instance.GetMainWindowMousePassthrough();
             bool canInteract = !mousePassthrough;
-            
+
             var html = new StringBuilder();
             html.AppendLine("<!DOCTYPE html>");
             html.AppendLine("<html>");
@@ -2764,7 +2767,7 @@ namespace UGTLive
             html.AppendLine("  justify-content: flex-start;");
             int borderRadius = ConfigManager.Instance.GetMonitorTextOverlayBorderRadius();
             html.AppendLine($"  border-radius: {borderRadius}px;"); // Rounded corners to better fit speech bubbles
-            
+
             if (canInteract)
             {
                 html.AppendLine("  pointer-events: auto;");
@@ -2994,7 +2997,7 @@ namespace UGTLive
             html.AppendLine("  icon.setAttribute('onclick', 'handleAudioIconClick(\"' + textObjectId + '\", ' + isSourceForClick + ')');");
             html.AppendLine("}");
             html.AppendLine("");
-            
+
             // Only add context menu handling if interaction is enabled (use variable declared at top)
             if (canInteract)
             {
@@ -3024,35 +3027,35 @@ namespace UGTLive
                 html.AppendLine("  }");
                 html.AppendLine("});");
             }
-            
+
             html.AppendLine("</script>");
             html.AppendLine("</head>");
             html.AppendLine("<body>");
-            
+
             // Add all text overlays if mode is not Hide
             if (_currentOverlayMode != OverlayMode.Hide && Logic.Instance != null)
             {
                 // If keeping translation visible, use old text objects instead of current (empty) ones
                 // But only if Main window is NOT in Source mode (Source mode should always show current)
                 var textObjects = (Logic.Instance.GetKeepingTranslationVisible() && _currentOverlayMode != OverlayMode.Source)
-                    ? Logic.Instance.GetTextObjectsOld() 
+                    ? Logic.Instance.GetTextObjectsOld()
                     : Logic.Instance.GetTextObjects();
                 if (textObjects != null)
                 {
                     foreach (var textObj in textObjects)
                     {
                         if (textObj == null) continue;
-                        
+
                         // Determine which text to show
                         string textToShow;
                         bool isTranslated = false;
                         string displayOrientation = textObj.TextOrientation;
-                        
+
                         if (_currentOverlayMode == OverlayMode.Translated && !string.IsNullOrEmpty(textObj.TextTranslated))
                         {
                             textToShow = textObj.TextTranslated;
                             isTranslated = true;
-                            
+
                             // Check if target language supports vertical
                             if (textObj.TextOrientation == "vertical")
                             {
@@ -3067,11 +3070,11 @@ namespace UGTLive
                         {
                             textToShow = textObj.Text;
                         }
-                        
+
                         // Get colors with override logic
                         Color bgColor;
                         Color textColor;
-                        
+
                         if (ConfigManager.Instance.IsMonitorOverrideBgColorEnabled())
                         {
                             bgColor = ConfigManager.Instance.GetMonitorOverrideBgColor();
@@ -3080,7 +3083,7 @@ namespace UGTLive
                         {
                             bgColor = textObj.BackgroundColor?.Color ?? Colors.Black;
                         }
-                        
+
                         if (ConfigManager.Instance.IsMonitorOverrideFontColorEnabled())
                         {
                             textColor = ConfigManager.Instance.GetMonitorOverrideFontColor();
@@ -3089,12 +3092,12 @@ namespace UGTLive
                         {
                             textColor = textObj.TextColor?.Color ?? Colors.White;
                         }
-                        
+
                         // Apply opacity setting to background color
                         double bgOpacity = ConfigManager.Instance.GetMonitorBgOpacity();
                         byte alphaValue = (byte)(bgOpacity * 255);
                         bgColor = Color.FromArgb(alphaValue, bgColor.R, bgColor.G, bgColor.B);
-                        
+
                         // Get font settings
                         string fontFamily = isTranslated
                             ? ConfigManager.Instance.GetTargetLanguageFontFamily()
@@ -3102,23 +3105,23 @@ namespace UGTLive
                         bool isBold = isTranslated
                             ? ConfigManager.Instance.GetTargetLanguageFontBold()
                             : ConfigManager.Instance.GetSourceLanguageFontBold();
-                        
+
                         // Encode text for HTML
                         string encodedText = System.Web.HttpUtility.HtmlEncode(textToShow.Trim())
                             .Replace("\r\n", "<br>")
                             .Replace("\r", "<br>")
                             .Replace("\n", "<br>");
-                        
+
                         // Use text object positions directly (no zoom on main window)
                         double left = textObj.X;
                         double top = textObj.Y;
                         double width = textObj.Width;
                         double height = textObj.Height;
-                        
+
                         // Calculate initial font size based on box height (will be refined by JavaScript)
                         // Use 70% of height as a starting point, ensuring it's reasonable
                         double initialFontSize = Math.Max(8, Math.Min(128, height * 0.7));
-                        
+
                         // Build the div for this text object with box-shadow for semi-transparent background
                         // (WebView2 doesn't support rgba() on background-color, but DOES on box-shadow)
                         string rgbaString = $"rgba({bgColor.R},{bgColor.G},{bgColor.B},{bgColor.A / 255.0:F3})";
@@ -3129,25 +3132,25 @@ namespace UGTLive
                             $"font-family: {string.Join(", ", fontFamily.Split(',').Select(f => $"\"{f.Trim()}\""))}; " +
                             $"font-weight: {(isBold ? "bold" : "normal")}; " +
                             $"font-size: {initialFontSize}px;";
-                        
+
                         string cssClass = displayOrientation == "vertical" ? "text-overlay vertical-text" : "text-overlay";
                         html.Append($"<div id='overlay-{textObj.ID}' class='{cssClass}' style='{styleAttr}' ");
                         html.Append($"data-source-audio='{System.Web.HttpUtility.HtmlAttributeEncode(textObj.SourceAudioFilePath ?? "")}' ");
                         html.Append($"data-target-audio='{System.Web.HttpUtility.HtmlAttributeEncode(textObj.TargetAudioFilePath ?? "")}' ");
                         html.Append($"data-source-ready='{textObj.SourceAudioReady.ToString().ToLower()}' ");
                         html.Append($"data-target-ready='{textObj.TargetAudioReady.ToString().ToLower()}'>");
-                        
+
                         // Add speaker icon - show if preload is enabled
                         bool isTtsPreloadEnabled = ConfigManager.Instance.IsTtsPreloadEnabled();
                         string preloadMode = ConfigManager.Instance.GetTtsPreloadMode();
                         bool preloadEnabled = isTtsPreloadEnabled && preloadMode != "Off";
-                        
+
                         if (preloadEnabled)
                         {
                             // Determine which audio should be shown for current mode
                             bool audioIsReady = false;
                             bool isSource = true;
-                            
+
                             // Only show speaker icon if the EXPECTED audio for current mode is ready
                             // (no visual fallback - but clicking will still try fallback audio)
                             if (isTranslated)
@@ -3173,26 +3176,26 @@ namespace UGTLive
                                     isSource = true;
                                 }
                             }
-                            
+
                             // Show icon with appropriate state
                             string iconEmoji = audioIsReady ? ConfigManager.ICON_SPEAKER_READY : ConfigManager.ICON_SPEAKER_NOT_READY;
                             string iconClass = audioIsReady ? "audio-icon" : "audio-icon loading";
                             html.Append($"<div class='{iconClass}' data-is-ready='{audioIsReady.ToString().ToLower()}' onclick='handleAudioIconClick(\"{textObj.ID}\", {isSource.ToString().ToLower()})'>{iconEmoji}</div>");
                         }
-                        
+
                         // Wrap text in span
                         html.Append($"<span class='text-content'>{encodedText}</span>");
                         html.AppendLine("</div>");
                     }
                 }
             }
-            
+
             html.AppendLine("</body>");
             html.AppendLine("</html>");
-            
+
             return html.ToString();
         }
-        
+
         public void RefreshMainWindowOverlays()
         {
             if (!Dispatcher.CheckAccess())
@@ -3201,7 +3204,7 @@ namespace UGTLive
                 Dispatcher.Invoke(() => RefreshMainWindowOverlays(), DispatcherPriority.Send);
                 return;
             }
-            
+
             try
             {
                 UpdateMainWindowOverlayWebView();
@@ -3211,19 +3214,19 @@ namespace UGTLive
                 Console.WriteLine($"Error refreshing MainWindow overlays: {ex.Message}");
             }
         }
-        
+
         // Header size changed - adjust overlay margin dynamically and update capture rect
         private void HeaderBorder_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (OverlayContent == null || TopControlGrid == null)
                 return;
-                
+
             // Get the actual height of the header (resize strip + header content)
             double headerHeight = TopControlGrid.ActualHeight;
-            
+
             // Update the overlay content margin to match header height
             OverlayContent.Margin = new Thickness(0, headerHeight, 0, 0);
-            
+
             // Update capture rectangle to account for new header height
             UpdateCaptureRect();
         }
@@ -3247,7 +3250,7 @@ namespace UGTLive
                 ConfigManager.Instance.SetOcrWindowTop(this.Top);
             }
         }
-        
+
         // Initialize the translation status timer
         private void InitializeTranslationStatusTimer()
         {
@@ -3255,13 +3258,13 @@ namespace UGTLive
             _translationStatusTimer.Interval = TimeSpan.FromSeconds(1);
             _translationStatusTimer.Tick += TranslationStatusTimer_Tick;
         }
-        
+
         // Update the translation status timer
         private void TranslationStatusTimer_Tick(object? sender, EventArgs e)
         {
             TimeSpan elapsed = DateTime.Now - _translationStartTime;
             string service = ConfigManager.Instance.GetCurrentTranslationService();
-            
+
             Dispatcher.Invoke(() =>
             {
                 if (translationStatusLabel != null)
@@ -3270,7 +3273,7 @@ namespace UGTLive
                 }
             });
         }
-        
+
         // Show the translation status
         public void ShowTranslationStatus(bool bSettling, double elapsedSettleTime = 0, double maxSettleTime = 0)
         {
@@ -3290,65 +3293,65 @@ namespace UGTLive
                             translationStatusLabel.Text = "Settling...";
                         }
                     }
-                    
+
                     if (translationStatusBorder != null)
                         translationStatusBorder.Visibility = Visibility.Visible;
                 });
                 return;
             }
-            
+
             _isShowingSettling = false;
             _translationStartTime = DateTime.Now;
             string service = ConfigManager.Instance.GetCurrentTranslationService();
-            
+
             Dispatcher.Invoke(() =>
             {
                 if (translationStatusLabel != null)
                     translationStatusLabel.Text = $"Waiting for {service}... 0:00";
-                
+
                 if (translationStatusBorder != null)
                     translationStatusBorder.Visibility = Visibility.Visible;
-                
+
                 // Start the timer if not already running
                 if (_translationStatusTimer == null)
                 {
                     InitializeTranslationStatusTimer();
                 }
-                
+
                 if (_translationStatusTimer != null && !_translationStatusTimer.IsEnabled)
                 {
                     _translationStatusTimer.Start();
                 }
             });
         }
-        
+
         // Hide the translation status
         public void HideTranslationStatus()
         {
             _isShowingSettling = false;
-            
+
             Dispatcher.Invoke(() =>
             {
                 if (_translationStatusTimer != null && _translationStatusTimer.IsEnabled)
                 {
                     _translationStatusTimer.Stop();
                 }
-                
+
                 // Update status to "Stopped" instead of hiding the border
                 // This maintains title bar height
                 if (translationStatusLabel != null)
                 {
                     translationStatusLabel.Text = "Stopped";
                 }
-                
+
                 // Keep the border visible to maintain title bar height
                 if (translationStatusBorder != null)
                     translationStatusBorder.Visibility = Visibility.Visible;
             });
         }
-        
+
         // OCR Status Display Methods (called by Logic.cs)
-        
+
         // Update OCR status display with computed values from Logic
         public void UpdateOCRStatusDisplay(string ocrMethod, double fps)
         {
@@ -3357,13 +3360,13 @@ namespace UGTLive
                 Dispatcher.Invoke(() => UpdateOCRStatusDisplay(ocrMethod, fps));
                 return;
             }
-            
+
             // Don't show if translation or settling is in progress
             if (_translationStatusTimer?.IsEnabled == true || _isShowingSettling)
             {
                 return;
             }
-            
+
             if (translationStatusLabel != null)
             {
                 // Only update text if it has changed to avoid flickering
@@ -3373,13 +3376,13 @@ namespace UGTLive
                     translationStatusLabel.Text = newText;
                 }
             }
-            
+
             if (translationStatusBorder != null && translationStatusBorder.Visibility != Visibility.Visible)
             {
                 translationStatusBorder.Visibility = Visibility.Visible;
             }
         }
-        
+
         // Hide OCR status display
         public void HideOCRStatusDisplay()
         {
@@ -3388,21 +3391,21 @@ namespace UGTLive
                 Dispatcher.Invoke(() => HideOCRStatusDisplay());
                 return;
             }
-            
+
             // Update status to "Stopped" instead of hiding
             // This maintains title bar height
             if (translationStatusLabel != null)
             {
                 translationStatusLabel.Text = "Stopped";
             }
-            
+
             // Keep border visible to maintain title bar height
             if (translationStatusBorder != null)
             {
                 translationStatusBorder.Visibility = Visibility.Visible;
             }
         }
-        
+
         // Export to HTML button handler
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
@@ -3413,22 +3416,22 @@ namespace UGTLive
             catch (Exception ex)
             {
                 Console.WriteLine($"Error exporting to HTML: {ex.Message}");
-                MessageBox.Show($"Error exporting to HTML: {ex.Message}", "Export Error", 
+                MessageBox.Show($"Error exporting to HTML: {ex.Message}", "Export Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        
+
         // Overlay radio button handler
         private void OverlayRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             // Skip if we're updating programmatically from ToggleOverlayMode
             if (_updatingOverlayMode)
                 return;
-                
+
             if (sender is System.Windows.Controls.RadioButton radioButton && radioButton.Tag != null)
             {
                 string mode = radioButton.Tag.ToString() ?? "Translated";
-                
+
                 switch (mode)
                 {
                     case "Hide":
@@ -3441,43 +3444,43 @@ namespace UGTLive
                         _currentOverlayMode = OverlayMode.Translated;
                         break;
                 }
-                
+
                 Console.WriteLine($"MainWindow overlay mode changed to: {_currentOverlayMode}");
-                
+
                 // Save to config
                 ConfigManager.Instance.SetMainWindowOverlayMode(mode);
-                
+
                 // Update overlay display
                 RefreshMainWindowOverlays();
             }
         }
-        
+
         // Mouse passthrough checkbox handler
         private void MousePassthroughCheckBox_Changed(object sender, RoutedEventArgs e)
         {
             if (mousePassthroughCheckBox == null)
                 return;
-                
+
             bool isEnabled = mousePassthroughCheckBox.IsChecked ?? false;
-            
+
             // Save to config
             ConfigManager.Instance.SetMainWindowMousePassthrough(isEnabled);
-            
+
             // Update mouse passthrough state
             updateMousePassthrough(isEnabled);
-            
+
             // Update text interaction state (inverse of passthrough)
             UpdateMainWindowTextInteraction();
-            
+
             Console.WriteLine($"Mouse passthrough {(isEnabled ? "enabled" : "disabled")}");
         }
-        
+
         // Helper method to update mouse passthrough state
         private void updateMousePassthrough(bool enabled)
         {
             if (OverlayContent == null)
                 return;
-                
+
             if (enabled)
             {
                 // Enable mouse passthrough - clicks go through to apps behind
@@ -3497,7 +3500,7 @@ namespace UGTLive
                 }
             }
         }
-        
+
         // Handle WebView2 web messages for context menu
         private void MainWindowOverlayWebView_WebMessageReceived(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs e)
         {
@@ -3508,23 +3511,23 @@ namespace UGTLive
                 {
                     return;
                 }
-                
+
                 using System.Text.Json.JsonDocument document = System.Text.Json.JsonDocument.Parse(message);
                 System.Text.Json.JsonElement root = document.RootElement;
-                
+
                 if (root.TryGetProperty("kind", out System.Text.Json.JsonElement kindElement))
                 {
                     string kind = kindElement.GetString() ?? "";
-                    
+
                     if (kind == "contextmenu")
                     {
-                        string textObjectId = root.TryGetProperty("textObjectId", out System.Text.Json.JsonElement idElement) 
+                        string textObjectId = root.TryGetProperty("textObjectId", out System.Text.Json.JsonElement idElement)
                             ? idElement.GetString() ?? string.Empty : string.Empty;
                         double x = root.TryGetProperty("x", out System.Text.Json.JsonElement xElement) ? xElement.GetDouble() : 0;
                         double y = root.TryGetProperty("y", out System.Text.Json.JsonElement yElement) ? yElement.GetDouble() : 0;
                         string selection = root.TryGetProperty("selection", out System.Text.Json.JsonElement selectionElement)
                             ? selectionElement.GetString() ?? string.Empty : string.Empty;
-                        
+
                         ShowMainWindowOverlayContextMenu(textObjectId, x, y, selection);
                     }
                     else if (kind == "playAudio")
@@ -3533,7 +3536,7 @@ namespace UGTLive
                             ? audioPathElement.GetString() ?? string.Empty : string.Empty;
                         string textObjectId = root.TryGetProperty("textObjectId", out System.Text.Json.JsonElement textObjectIdElement)
                             ? textObjectIdElement.GetString() ?? string.Empty : string.Empty;
-                        
+
                         if (!string.IsNullOrEmpty(audioPath))
                         {
                             // Play audio - the AudioPlaybackManager event will update icons
@@ -3544,9 +3547,9 @@ namespace UGTLive
                     {
                         string textObjectId = root.TryGetProperty("textObjectId", out System.Text.Json.JsonElement textObjectIdElement)
                             ? textObjectIdElement.GetString() ?? string.Empty : string.Empty;
-                        
+
                         AudioPlaybackManager.Instance.StopCurrentPlayback();
-                        
+
                         if (!string.IsNullOrEmpty(textObjectId))
                         {
                             UpdateAudioIconInWebView(textObjectId, false);
@@ -3559,7 +3562,7 @@ namespace UGTLive
                 Console.WriteLine($"Error handling MainWindow overlay WebView message: {ex.Message}");
             }
         }
-        
+
         private void UpdateAudioIconInWebView(string textObjectId, bool isPlaying)
         {
             try
@@ -3575,13 +3578,13 @@ namespace UGTLive
                 Console.WriteLine($"Error updating audio icon in WebView: {ex.Message}");
             }
         }
-        
+
         private async Task PlayAudioAndUpdateIcon(string audioPath, string textObjectId)
         {
             try
             {
                 await AudioPlaybackManager.Instance.PlayAudioFileAsync(audioPath, textObjectId);
-                
+
                 // Update icon back to speaker when playback finishes
                 if (!string.IsNullOrEmpty(textObjectId))
                 {
@@ -3597,7 +3600,7 @@ namespace UGTLive
                 }
             }
         }
-        
+
         private void MainWindowOverlayWebView_ContextMenuRequested(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2ContextMenuRequestedEventArgs e)
         {
             try
@@ -3609,7 +3612,7 @@ namespace UGTLive
                 Console.WriteLine($"Error suppressing default WebView2 context menu: {ex.Message}");
             }
         }
-        
+
         private void ShowMainWindowOverlayContextMenu(string textObjectId, double clientX, double clientY, string? selection)
         {
             try
@@ -3618,10 +3621,10 @@ namespace UGTLive
                 {
                     return;
                 }
-                
+
                 _currentMainWindowContextMenuTextObjectId = textObjectId;
                 _currentMainWindowContextMenuSelection = string.IsNullOrWhiteSpace(selection) ? null : selection.Trim();
-                
+
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     try
@@ -3629,7 +3632,7 @@ namespace UGTLive
                         System.Windows.Point contentPoint = new System.Windows.Point(clientX, clientY);
                         System.Windows.Point relativeToWebView = textOverlayWebView.TranslatePoint(contentPoint, this);
                         System.Windows.Point screenPoint = this.PointToScreen(relativeToWebView);
-                        
+
                         System.Windows.Controls.ContextMenu contextMenu = CreateMainWindowOverlayContextMenu();
                         contextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.AbsolutePoint;
                         contextMenu.HorizontalOffset = screenPoint.X;
@@ -3647,50 +3650,50 @@ namespace UGTLive
                 Console.WriteLine($"Error preparing MainWindow context menu: {ex.Message}");
             }
         }
-        
+
         private System.Windows.Controls.ContextMenu CreateMainWindowOverlayContextMenu()
         {
             System.Windows.Controls.ContextMenu contextMenu = new System.Windows.Controls.ContextMenu();
-            
+
             // Copy menu item
             System.Windows.Controls.MenuItem copyMenuItem = new System.Windows.Controls.MenuItem();
             copyMenuItem.Header = "Copy";
             copyMenuItem.Click += MainWindowOverlayContextMenu_Copy_Click;
             contextMenu.Items.Add(copyMenuItem);
-            
+
             // Copy Translated menu item (only shown when in Source mode)
             System.Windows.Controls.MenuItem copyTranslatedMenuItem = new System.Windows.Controls.MenuItem();
             copyTranslatedMenuItem.Header = "Copy Translated";
             copyTranslatedMenuItem.Click += MainWindowOverlayContextMenu_CopyTranslated_Click;
             contextMenu.Items.Add(copyTranslatedMenuItem);
-            
+
             // Separator
             contextMenu.Items.Add(new System.Windows.Controls.Separator());
-            
+
             // Lesson menu item (ChatGPT)
             System.Windows.Controls.MenuItem lessonMenuItem = new System.Windows.Controls.MenuItem();
             lessonMenuItem.Header = "Lesson";
             lessonMenuItem.Click += MainWindowOverlayContextMenu_Lesson_Click;
             contextMenu.Items.Add(lessonMenuItem);
-            
+
             // Jisho lookup menu item (jisho.org)
             System.Windows.Controls.MenuItem lookupKanjiMenuItem = new System.Windows.Controls.MenuItem();
             lookupKanjiMenuItem.Header = "Jisho lookup";
             lookupKanjiMenuItem.Click += MainWindowOverlayContextMenu_LookupKanji_Click;
             contextMenu.Items.Add(lookupKanjiMenuItem);
-            
+
             // Speak menu item
             System.Windows.Controls.MenuItem speakMenuItem = new System.Windows.Controls.MenuItem();
             speakMenuItem.Header = "Speak";
             speakMenuItem.Click += MainWindowOverlayContextMenu_Speak_Click;
             contextMenu.Items.Add(speakMenuItem);
-            
+
             // Speak (source) menu item (only shown when in Translated mode)
             System.Windows.Controls.MenuItem speakSourceMenuItem = new System.Windows.Controls.MenuItem();
             speakSourceMenuItem.Header = "Speak (source)";
             speakSourceMenuItem.Click += MainWindowOverlayContextMenu_SpeakSource_Click;
             contextMenu.Items.Add(speakSourceMenuItem);
-            
+
             // Update menu visibility when opened
             contextMenu.Opened += (s, e) =>
             {
@@ -3701,47 +3704,47 @@ namespace UGTLive
                     copyTranslatedMenuItem.IsEnabled = !string.IsNullOrEmpty(textObj.TextTranslated);
                     speakSourceMenuItem.Visibility = _currentOverlayMode == OverlayMode.Translated ? Visibility.Visible : Visibility.Collapsed;
                 }
-                
+
                 // Exclude context menu popup from screen capture
                 ExcludeContextMenuFromCapture(contextMenu);
             };
-            
+
             contextMenu.Closed += (s, e) =>
             {
                 _currentMainWindowContextMenuTextObjectId = null;
                 _currentMainWindowContextMenuSelection = null;
             };
-            
+
             return contextMenu;
         }
-        
+
         private TextObject? GetMainWindowTextObjectById(string? id)
         {
             if (string.IsNullOrEmpty(id) || Logic.Instance == null)
             {
                 return null;
             }
-            
+
             var textObjects = Logic.Instance.GetTextObjects();
             return textObjects?.FirstOrDefault(t => t.ID == id);
         }
-        
+
         private void MainWindowOverlayContextMenu_Copy_Click(object sender, RoutedEventArgs e)
         {
             TextObject? textObj = GetMainWindowTextObjectById(_currentMainWindowContextMenuTextObjectId);
             if (textObj != null)
             {
-                string textToCopy = !string.IsNullOrWhiteSpace(_currentMainWindowContextMenuSelection) 
-                    ? _currentMainWindowContextMenuSelection 
-                    : (_currentOverlayMode == OverlayMode.Translated && !string.IsNullOrEmpty(textObj.TextTranslated) 
-                        ? textObj.TextTranslated 
+                string textToCopy = !string.IsNullOrWhiteSpace(_currentMainWindowContextMenuSelection)
+                    ? _currentMainWindowContextMenuSelection
+                    : (_currentOverlayMode == OverlayMode.Translated && !string.IsNullOrEmpty(textObj.TextTranslated)
+                        ? textObj.TextTranslated
                         : textObj.Text);
-                
+
                 System.Windows.Forms.Clipboard.SetText(textToCopy);
                 SetStatus("Text copied to clipboard");
             }
         }
-        
+
         private void MainWindowOverlayContextMenu_CopyTranslated_Click(object sender, RoutedEventArgs e)
         {
             TextObject? textObj = GetMainWindowTextObjectById(_currentMainWindowContextMenuTextObjectId);
@@ -3751,29 +3754,29 @@ namespace UGTLive
                 SetStatus("Translated text copied to clipboard");
             }
         }
-        
+
         private void MainWindowOverlayContextMenu_Lesson_Click(object sender, RoutedEventArgs e)
         {
             TextObject? textObj = GetMainWindowTextObjectById(_currentMainWindowContextMenuTextObjectId);
             if (textObj != null)
             {
-                string textToLearn = !string.IsNullOrWhiteSpace(_currentMainWindowContextMenuSelection) 
-                    ? _currentMainWindowContextMenuSelection 
+                string textToLearn = !string.IsNullOrWhiteSpace(_currentMainWindowContextMenuSelection)
+                    ? _currentMainWindowContextMenuSelection
                     : textObj.Text;
-                
+
                 if (!string.IsNullOrWhiteSpace(textToLearn))
                 {
                     // Get prompt and URL templates from config
                     string promptTemplate = ConfigManager.Instance.GetLessonPromptTemplate();
                     string urlTemplate = ConfigManager.Instance.GetLessonUrlTemplate();
-                    
+
                     // Format the prompt with the text to learn
                     string lessonPrompt = string.Format(promptTemplate, textToLearn);
                     string encodedPrompt = Uri.EscapeDataString(lessonPrompt);
-                    
+
                     // Format the URL with the encoded prompt
                     string lessonUrl = string.Format(urlTemplate, encodedPrompt);
-                    
+
                     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
                     {
                         FileName = lessonUrl,
@@ -3782,16 +3785,16 @@ namespace UGTLive
                 }
             }
         }
-        
+
         private void MainWindowOverlayContextMenu_LookupKanji_Click(object sender, RoutedEventArgs e)
         {
             TextObject? textObj = GetMainWindowTextObjectById(_currentMainWindowContextMenuTextObjectId);
             if (textObj != null)
             {
-                string textToLearn = !string.IsNullOrWhiteSpace(_currentMainWindowContextMenuSelection) 
-                    ? _currentMainWindowContextMenuSelection 
+                string textToLearn = !string.IsNullOrWhiteSpace(_currentMainWindowContextMenuSelection)
+                    ? _currentMainWindowContextMenuSelection
                     : textObj.Text;
-                
+
                 if (!string.IsNullOrWhiteSpace(textToLearn))
                 {
                     string url = $"https://jisho.org/search/{Uri.EscapeDataString(textToLearn)}";
@@ -3803,7 +3806,7 @@ namespace UGTLive
                 }
             }
         }
-        
+
         private async void MainWindowOverlayContextMenu_Speak_Click(object sender, RoutedEventArgs e)
         {
             TextObject? textObj = GetMainWindowTextObjectById(_currentMainWindowContextMenuTextObjectId);
@@ -3814,7 +3817,7 @@ namespace UGTLive
                     : (_currentOverlayMode == OverlayMode.Translated && !string.IsNullOrEmpty(textObj.TextTranslated)
                         ? textObj.TextTranslated
                         : textObj.Text);
-                
+
                 if (!string.IsNullOrWhiteSpace(textToSpeak))
                 {
                     // Use the configured TTS service
@@ -3830,7 +3833,7 @@ namespace UGTLive
                 }
             }
         }
-        
+
         private async void MainWindowOverlayContextMenu_SpeakSource_Click(object sender, RoutedEventArgs e)
         {
             TextObject? textObj = GetMainWindowTextObjectById(_currentMainWindowContextMenuTextObjectId);
@@ -3838,7 +3841,7 @@ namespace UGTLive
             {
                 // Always speak the source text (ignoring selection)
                 string textToSpeak = textObj.Text;
-                
+
                 if (!string.IsNullOrWhiteSpace(textToSpeak))
                 {
                     // Use the configured TTS service
@@ -3853,6 +3856,74 @@ namespace UGTLive
                     }
                 }
             }
+        }
+
+        public void ApplyBorderColor()
+        {
+            // Apply border color on UI thread
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (MainBorder == null)
+                    return;
+
+                bool isEnabled = ConfigManager.Instance.IsMainWindowOverrideBorderColorEnabled();
+
+                Color borderBrushColor;
+
+                if (isEnabled)
+                {
+                    // Get color and opacity from config
+                    Color borderColor = ConfigManager.Instance.GetMainWindowOverrideBorderColor();
+                    double opacity = ConfigManager.Instance.GetMainWindowBorderOpacity();
+
+                    // Apply opacity to the alpha channel
+                    borderBrushColor = Color.FromArgb(
+                        (byte)(borderColor.A * opacity),
+                        borderColor.R,
+                        borderColor.G,
+                        borderColor.B);
+                }
+                else
+                {
+                    // Use default border color
+                    borderBrushColor = Color.FromArgb(207, 255, 0, 0);
+                }
+
+                // Apply to main border
+                MainBorder.BorderBrush = new SolidColorBrush(borderBrushColor);
+
+                // Apply to resize border (with slightly different opacity to match original style)
+                if (ResizeBorder != null)
+                {
+                    // Resize border uses a more transparent version (original was #8F = 143/255 ≈ 0.56)
+                    // Apply the same relative opacity to the new color
+                    Color resizeBorderColor = Color.FromArgb(
+                        (byte)(borderBrushColor.A * 0.56),
+                        borderBrushColor.R,
+                        borderBrushColor.G,
+                        borderBrushColor.B);
+                    ResizeBorder.BorderBrush = new SolidColorBrush(resizeBorderColor);
+                }
+
+                // Apply to header border
+                if (HeaderBorder != null)
+                {
+                    HeaderBorder.BorderBrush = new SolidColorBrush(borderBrushColor);
+                }
+
+                // Apply to top resize strip (with more transparent version to match original style)
+                if (TopResizeStrip != null)
+                {
+                    // Top resize strip uses a more transparent version (original was #50 = 80/255 ≈ 0.31)
+                    // Apply the same relative opacity to the new color
+                    Color topResizeStripColor = Color.FromArgb(
+                        (byte)(borderBrushColor.A * 0.31),
+                        borderBrushColor.R,
+                        borderBrushColor.G,
+                        borderBrushColor.B);
+                    TopResizeStrip.Background = new SolidColorBrush(topResizeStripColor);
+                }
+            });
         }
     }
 }

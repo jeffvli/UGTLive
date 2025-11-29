@@ -1054,6 +1054,73 @@
                                         ToolTip="Border radius for text overlay backgrounds. Higher values create more rounded corners, better for speech bubbles."/>
                             </Grid>
                         </GroupBox>
+
+                        <!-- Main Window Settings -->
+                        <GroupBox Header="Main Window Settings" Margin="0,0,0,15" Padding="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Override Border Color Checkbox -->
+                                <CheckBox x:Name="overrideBorderColorCheckBox" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                         Margin="0,5" IsChecked="False"
+                                         Checked="OverrideBorderColorCheckBox_CheckedChanged"
+                                         Unchecked="OverrideBorderColorCheckBox_CheckedChanged"
+                                         Content="Override Border Color"
+                                         ToolTip="Override the border color for the main window"/>
+
+                                <!-- Border Color Picker -->
+                                <TextBlock Text="Border Color:" Grid.Row="1" Grid.Column="0"
+                                          VerticalAlignment="Center" Margin="20,5,10,5"/>
+                                <DockPanel Grid.Row="1" Grid.Column="1" Margin="0,5">
+                                    <Button x:Name="overrideBorderColorButton"
+                                            Width="30" Height="20"
+                                            Margin="0,0,5,0"
+                                            Click="OverrideBorderColorButton_Click"/>
+                                    <TextBlock x:Name="overrideBorderColorText"
+                                               Text="#CFFF0000"
+                                               VerticalAlignment="Center"/>
+                                </DockPanel>
+
+                                <!-- Border Opacity Slider -->
+                                <TextBlock Text="Border Opacity:" Grid.Row="2" Grid.Column="0"
+                                          VerticalAlignment="Center" Margin="20,5,10,5"
+                                          ToolTip="Opacity of border (0 = transparent, 1 = solid)"/>
+                                <Grid Grid.Row="2" Grid.Column="1" Margin="0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0"
+                                            BorderThickness="0"
+                                            Padding="0,10"
+                                            Margin="0,0,10,0">
+                                        <Slider x:Name="borderOpacitySlider"
+                                                Minimum="0" Maximum="1"
+                                                Value="1.0"
+                                                TickPlacement="BottomRight"
+                                                TickFrequency="0.01"
+                                                IsSnapToTickEnabled="True"
+                                                ValueChanged="BorderOpacitySlider_ValueChanged"
+                                                PreviewMouseLeftButtonDown="BorderOpacitySlider_PreviewMouseLeftButtonDown"
+                                                HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock x:Name="borderOpacityText"
+                                               Grid.Column="1"
+                                               Text="100%"
+                                               VerticalAlignment="Center"
+                                               Width="40"/>
+                                </Grid>
+                            </Grid>
+                        </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

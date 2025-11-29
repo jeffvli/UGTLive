@@ -50,11 +50,11 @@
                     </Grid.RowDefinitions>
                     
                     <!-- Top resize strip - 10px height -->
-                    <Border Grid.Row="0" Background="#50FF0000" Cursor="SizeNS"
+                    <Border Grid.Row="0" x:Name="TopResizeStrip" Background="#50FF0000" Cursor="SizeNS"
                            WindowChrome.IsHitTestVisibleInChrome="False"/>
                     
                     <!-- Header with wrappable content -->
-                    <Border Grid.Row="1" x:Name="HeaderBorder" Background="#CC202020"
+                    <Border Grid.Row="1" x:Name="HeaderBorder" Background="#CC202020" BorderThickness="1"
                             MouseLeftButtonDown="Header_MouseLeftButtonDown"
                             WindowChrome.IsHitTestVisibleInChrome="True"
                             SizeChanged="HeaderBorder_SizeChanged">
@@ -183,7 +183,7 @@
                           Cursor="SizeNWSE"/>
                 
                 <!-- Resize borders - visual indicators only -->
-                <Border BorderBrush="#8FFF0000" BorderThickness="7" Background="Transparent" IsHitTestVisible="False"/>
+                <Border x:Name="ResizeBorder" BorderBrush="#8FFF0000" BorderThickness="7" Background="Transparent" IsHitTestVisible="False"/>
             </Grid>
         </Border>
     </Grid>

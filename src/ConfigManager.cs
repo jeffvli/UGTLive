@@ -42,14 +42,14 @@ namespace UGTLive
         // Google Translate settings
         public const string GOOGLE_TRANSLATE_USE_CLOUD_API = "google_translate_use_cloud_api";
         public const string GOOGLE_TRANSLATE_AUTO_MAP_LANGUAGES = "google_translate_auto_map_languages";
-        
+
         // Google Vision API settings
         public const string GOOGLE_VISION_API_KEY = "google_vision_api_key";
         public const string GOOGLE_VISION_ENDPOINT = "google_vision_endpoint";
         public const string GOOGLE_VISION_HORIZONTAL_GLUE = "google_vision_horizontal_glue";
         public const string GOOGLE_VISION_VERTICAL_GLUE = "google_vision_vertical_glue";
         public const string GOOGLE_VISION_KEEP_LINEFEEDS = "google_vision_keep_linefeeds";
-        
+
         // Per-OCR glue settings (for EasyOCR, MangaOCR, docTR, Windows OCR, Google Vision)
         // Format: horizontal_glue_<ocrmethod>, vertical_glue_<ocrmethod>, keep_linefeeds_<ocrmethod>, leave_translation_onscreen_<ocrmethod>
         public const string HORIZONTAL_GLUE_PREFIX = "horizontal_glue_";
@@ -58,12 +58,12 @@ namespace UGTLive
         public const string HEIGHT_SIMILARITY_PREFIX = "height_similarity_";
         public const string KEEP_LINEFEEDS_PREFIX = "keep_linefeeds_";
         public const string LEAVE_TRANSLATION_ONSCREEN_PREFIX = "leave_translation_onscreen_";
-        
+
         // Translation context keys
         public const string MAX_CONTEXT_PIECES = "max_context_pieces";
         public const string MIN_CONTEXT_SIZE = "min_context_size";
         public const string GAME_INFO = "game_info";
-        
+
         // OCR configuration keys
         public const string MIN_TEXT_FRAGMENT_SIZE = "min_text_fragment_size";
         public const string BLOCK_DETECTION_SCALE = "block_detection_scale";
@@ -73,7 +73,7 @@ namespace UGTLive
         public const string LEAVE_TRANSLATION_ONSCREEN = "leave_translation_onscreen";
         public const string MIN_LETTER_CONFIDENCE = "min_letter_confidence";
         public const string MIN_LINE_CONFIDENCE = "min_line_confidence";
-        
+
         // Per-OCR Confidence Keys prefix
         public const string MIN_LETTER_CONFIDENCE_PREFIX = "min_letter_confidence_";
         public const string MIN_LINE_CONFIDENCE_PREFIX = "min_line_confidence_";
@@ -134,7 +134,7 @@ namespace UGTLive
             }
             return internalId; // Fallback to internal ID if display name not found
         }
-        
+
         // Text-to-Speech configuration keys
         public const string TTS_ENABLED = "tts_enabled";
         public const string TTS_SERVICE = "tts_service";
@@ -144,7 +144,7 @@ namespace UGTLive
         public const string ELEVENLABS_CUSTOM_VOICE_ID = "elevenlabs_custom_voice_id";
         public const string GOOGLE_TTS_API_KEY = "google_tts_api_key";
         public const string GOOGLE_TTS_VOICE = "google_tts_voice";
-        
+
         // TTS Preload configuration keys
         public const string TTS_SOURCE_SERVICE = "tts_source_service";
         public const string TTS_SOURCE_VOICE = "tts_source_voice";
@@ -161,11 +161,11 @@ namespace UGTLive
         public const string TTS_DELETE_CACHE_ON_STARTUP = "tts_delete_cache_on_startup";
         public const string TTS_VERTICAL_OVERLAP_THRESHOLD = "tts_vertical_overlap_threshold";
         public const string TTS_MAX_CONCURRENT_DOWNLOADS = "tts_max_concurrent_downloads";
-        
+
         // UI Icon Constants
         public const string ICON_SPEAKER_READY = "🔉";
         public const string ICON_SPEAKER_NOT_READY = "◯";
-        
+
         // ChatBox configuration keys
         public const string CHATBOX_FONT_FAMILY = "chatbox_font_family";
         public const string CHATBOX_FONT_SIZE = "chatbox_font_size";
@@ -194,7 +194,7 @@ namespace UGTLive
         // OpenAI Translation specific settings
         public const string OPENAI_TRANSLATION_ENABLED = "openai_translation_enabled";
         public const string OPENAI_TRANSLATION_TARGET_LANGUAGE = "openai_translation_target_language";
-        
+
         // OpenAI Audio Playback settings
         public const string OPENAI_AUDIO_PLAYBACK_ENABLED = "openai_audio_playback_enabled";
         public const string OPENAI_AUDIO_OUTPUT_DEVICE_INDEX = "openai_audio_output_device_index";
@@ -215,7 +215,12 @@ namespace UGTLive
         public const string MAIN_WINDOW_OVERLAY_MODE = "main_window_overlay_mode";
         public const string MAIN_WINDOW_MOUSE_PASSTHROUGH = "main_window_mouse_passthrough";
         public const string WINDOWS_VISIBLE_IN_SCREENSHOTS = "windows_visible_in_screenshots";
-        
+
+        // Main Window Border Color Settings
+        public const string MAIN_WINDOW_OVERRIDE_BORDER_COLOR_ENABLED = "main_window_override_border_color_enabled";
+        public const string MAIN_WINDOW_OVERRIDE_BORDER_COLOR = "main_window_override_border_color";
+        public const string MAIN_WINDOW_BORDER_OPACITY = "main_window_border_opacity";
+
         // docTR-specific glue toggle
         public const string GLUE_DOCTR_LINES = "glue_doctr_lines";
 
@@ -224,11 +229,11 @@ namespace UGTLive
         public const string SOURCE_LANGUAGE_FONT_BOLD = "source_language_font_bold";
         public const string TARGET_LANGUAGE_FONT_FAMILY = "target_language_font_family";
         public const string TARGET_LANGUAGE_FONT_BOLD = "target_language_font_bold";
-        
+
         // Lesson feature settings
         public const string LESSON_PROMPT_TEMPLATE = "lesson_prompt_template";
         public const string LESSON_URL_TEMPLATE = "lesson_url_template";
-        
+
         // Debug logging settings
         public const string LOG_EXTRA_DEBUG_STUFF = "log_extra_debug_stuff";
 
@@ -249,7 +254,7 @@ namespace UGTLive
         private ConfigManager()
         {
             _configValues = new Dictionary<string, string>();
-            
+
             // Set config file paths to be in the application's directory
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
             _configFilePath = Path.Combine(appDirectory, "config.txt");
@@ -258,21 +263,21 @@ namespace UGTLive
             _chatgptConfigFilePath = Path.Combine(appDirectory, "chatgpt_config.txt");
             _googleTranslateConfigFilePath = Path.Combine(appDirectory, "google_translate_config.txt");
             _llamacppConfigFilePath = Path.Combine(appDirectory, "llamacpp_config.txt");
-            
+
             Console.WriteLine($"Config file path: {_configFilePath}");
             Console.WriteLine($"Gemini config file path: {_geminiConfigFilePath}");
             Console.WriteLine($"Ollama config file path: {_ollamaConfigFilePath}");
             Console.WriteLine($"ChatGPT config file path: {_chatgptConfigFilePath}");
             Console.WriteLine($"Google Translate config file path: {_googleTranslateConfigFilePath}");
             Console.WriteLine($"llama.cpp config file path: {_llamacppConfigFilePath}");
-            
+
             // Load main config values
             LoadConfig();
-            
+
             // Force "windows visible in screenshots" to false at startup (dangerous option)
             SetWindowsVisibleInScreenshots(false);
             Console.WriteLine("Forced 'windows visible in screenshots' to false at startup (dangerous option disabled)");
-            
+
             // Load translation service from config
             if (_configValues.TryGetValue(TRANSLATION_SERVICE, out string? service))
             {
@@ -292,7 +297,7 @@ namespace UGTLive
                 _configValues[TRANSLATION_SERVICE] = _currentTranslationService;
                 SaveConfig();
             }
-            
+
             // Remove the old "llm_prompt_multi" entry if it exists, as it's now stored in separate files
             if (_configValues.ContainsKey("llm_prompt_multi"))
             {
@@ -300,7 +305,7 @@ namespace UGTLive
                 _configValues.Remove("llm_prompt_multi");
                 SaveConfig();
             }
-            
+
             // Create service-specific config files if they don't exist
             EnsureServiceConfigFilesExist();
         }
@@ -311,22 +316,22 @@ namespace UGTLive
             string value = GetValue(key, defaultValue.ToString().ToLower());
             return value.ToLower() == "true";
         }
-        
+
         public void SetBoolValue(string key, bool value)
         {
             SetValue(key, value.ToString().ToLower());
         }
-        
+
         public bool GetShowServerWindow()
         {
             return GetBoolValue(SHOW_SERVER_WINDOW, false);
         }
-        
+
         public void SetShowServerWindow(bool showWindow)
         {
             SetBoolValue(SHOW_SERVER_WINDOW, showWindow);
         }
-        
+
 
         // Load configuration from file
         private void LoadConfig()
@@ -343,10 +348,10 @@ namespace UGTLive
                 {
                     // Read all content from the config file
                     string content = File.ReadAllText(_configFilePath);
-                    
+
                     // First, process multiline values with tags
                     ProcessMultilineValues(content);
-                    
+
                     // Then process regular single-line values
                     ProcessSingleLineValues(content);
                 }
@@ -354,10 +359,10 @@ namespace UGTLive
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading config: {ex.Message}");
-                MessageBox.Show($"Error loading configuration: {ex.Message}", "Configuration Error", 
+                MessageBox.Show($"Error loading configuration: {ex.Message}", "Configuration Error",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            
+
             // Debug output: dump all loaded config values
             Console.WriteLine("=== All Loaded Config Values ===");
             foreach (var entry in _configValues)
@@ -366,7 +371,7 @@ namespace UGTLive
             }
             Console.WriteLine("===============================");
         }
-        
+
         public bool GetGoogleTranslateUseCloudApi()
         {
             return GetBoolValue(GOOGLE_TRANSLATE_USE_CLOUD_API, false);
@@ -424,7 +429,7 @@ namespace UGTLive
             _configValues[GOOGLE_TTS_API_KEY] = "<your API key here>";
             _configValues[GOOGLE_TTS_VOICE] = "ja-JP-Neural2-B";
             _configValues[TTS_ENABLED] = "false";
-            
+
             // TTS Preload defaults
             _configValues[TTS_SOURCE_SERVICE] = "Google Cloud TTS";
             _configValues[TTS_SOURCE_VOICE] = "ja-JP-Neural2-B";
@@ -458,41 +463,46 @@ namespace UGTLive
             _configValues[IGNORE_PHRASES] = "";
             _configValues[OVERLAY_CLEAR_DELAY_SECONDS] = "0.1";
             _configValues[PAUSE_OCR_WHILE_TRANSLATING] = "true";
-            
+
             // Audio Input Device default
             _configValues[AUDIO_INPUT_DEVICE_INDEX] = "0"; // Default to device index 0
             _configValues[OPENAI_SILENCE_DURATION_MS] = "250"; // Default silence duration
             // Ensure audio playback starts disabled by default
             _configValues[OPENAI_AUDIO_PLAYBACK_ENABLED] = "false";
-            
+
             // Monitor Window Override Color defaults
             _configValues[MONITOR_OVERRIDE_BG_COLOR_ENABLED] = "false";
             _configValues[MONITOR_OVERRIDE_BG_COLOR] = "#FF000000"; // Black
             _configValues[MONITOR_BG_OPACITY] = "1.0"; // Default opacity 100% (fully opaque)
             _configValues[MONITOR_OVERRIDE_FONT_COLOR_ENABLED] = "false";
             _configValues[MONITOR_OVERRIDE_FONT_COLOR] = "#FFFFFFFF"; // White
-            
+
+            // Main Window Border Color defaults
+            _configValues[MAIN_WINDOW_OVERRIDE_BORDER_COLOR_ENABLED] = "false";
+            _configValues[MAIN_WINDOW_OVERRIDE_BORDER_COLOR] = "#CFFF0000"; // Default red border
+            _configValues[MAIN_WINDOW_BORDER_OPACITY] = "1.0"; // Default opacity 100% (fully opaque)
+
             // Font Settings defaults
             _configValues[SOURCE_LANGUAGE_FONT_FAMILY] = "MS Gothic";
             _configValues[SOURCE_LANGUAGE_FONT_BOLD] = "true";
             _configValues[TARGET_LANGUAGE_FONT_FAMILY] = "Comic Sans MS";
             _configValues[TARGET_LANGUAGE_FONT_BOLD] = "true";
-            
+
             // Text Area Size Expansion defaults
             _configValues[MONITOR_TEXT_AREA_EXPANSION_WIDTH] = "6";
             _configValues[MONITOR_TEXT_AREA_EXPANSION_HEIGHT] = "2";
             _configValues[MONITOR_TEXT_OVERLAY_BORDER_RADIUS] = "8";
-            
+
             // Manga OCR minimum region size defaults
             _configValues[MANGA_OCR_MIN_REGION_WIDTH] = "10";
             _configValues[MANGA_OCR_MIN_REGION_HEIGHT] = "10";
             _configValues[MANGA_OCR_OVERLAP_ALLOWED_PERCENT] = "90";
-            
+
             // Save the default configuration
             SaveConfig();
             Console.WriteLine("Default configuration created and saved.");
         }
-        
+
         // Process multiline values enclosed in tags
         private void ProcessMultilineValues(string content)
         {
@@ -500,24 +510,24 @@ namespace UGTLive
             {
                 // Use regex to find content between tags like <key_start>content<key_end>
                 string pattern = @"<(\w+)_start>(.*?)<\1_end>";
-                
+
                 // Use RegexOptions.Singleline to make '.' match newlines as well
                 var matches = Regex.Matches(content, pattern, RegexOptions.Singleline);
-                
+
                 foreach (Match match in matches)
                 {
                     if (match.Groups.Count >= 3)
                     {
                         string key = match.Groups[1].Value;
                         string value = match.Groups[2].Value;
-                        
+
                         // Trim leading and trailing newlines/whitespace to prevent accumulation
                         // This preserves intentional newlines within the content but removes leading/trailing ones
                         value = value.TrimStart('\r', '\n').TrimEnd('\r', '\n', ' ', '\t');
-                        
+
                         // Store the value
                         _configValues[key] = value;
-                        
+
                         Console.WriteLine($"Loaded multiline config: {key} ({value.Length} chars)");
                     }
                 }
@@ -527,7 +537,7 @@ namespace UGTLive
                 Console.WriteLine($"Error parsing multiline values: {ex.Message}");
             }
         }
-        
+
         // Process single-line key-value pairs
         private void ProcessSingleLineValues(string content)
         {
@@ -535,26 +545,26 @@ namespace UGTLive
             {
                 // Remove sections with multiline tags to avoid parsing them as single-line entries
                 content = Regex.Replace(content, @"<\w+_start>.*?<\w+_end>", "", RegexOptions.Singleline);
-                
+
                 // Split into lines and process each line
                 string[] lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                
+
                 foreach (string line in lines)
                 {
                     // Skip comments and empty lines
                     if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
                         continue;
-                    
+
                     // Skip lines that are part of multiline tags
                     if (line.Contains("_start>") || line.Contains("_end>"))
                         continue;
-                    
+
                     // Parse config entries in format "key|value|"
                     string[] parts = line.Split('|');
                     if (parts.Length >= 2 && !string.IsNullOrWhiteSpace(parts[0]))
                     {
                         string key = parts[0].Trim();
-                        
+
                         // Special handling for IGNORE_PHRASES
                         if (key == IGNORE_PHRASES)
                         {
@@ -563,7 +573,7 @@ namespace UGTLive
                             // Remove trailing delimiter if present
                             if (phraseValue.EndsWith("|"))
                                 phraseValue = phraseValue.Substring(0, phraseValue.Length - 1);
-                                
+
                             _configValues[key] = phraseValue;
                             if (GetLogExtraDebugStuff())
                             {
@@ -571,10 +581,10 @@ namespace UGTLive
                             }
                             continue;
                         }
-                        
+
                         // Normal key-value pairs
                         string value = parts[1].Trim();
-                        
+
                         // Only add if not already added by multiline processing
                         if (!_configValues.ContainsKey(key))
                         {
@@ -600,13 +610,13 @@ namespace UGTLive
                 sb.AppendLine("# Format for single-line values: key|value|");
                 sb.AppendLine("# Format for multiline values: <key_start>multiple lines of content<key_end>");
                 sb.AppendLine();
-                
+
                 // First add single-line entries
                 foreach (var entry in _configValues.Where(e => !ShouldBeMultiline(e.Key)))
                 {
                     sb.AppendLine($"{entry.Key}|{entry.Value}|");
                 }
-                
+
                 // Then add multiline entries
                 foreach (var entry in _configValues.Where(e => ShouldBeMultiline(e.Key)))
                 {
@@ -617,10 +627,10 @@ namespace UGTLive
                     sb.AppendLine();
                     sb.AppendLine($"<{entry.Key}_end>");
                 }
-                
+
                 // Write to file
                 File.WriteAllText(_configFilePath, sb.ToString());
-                
+
                 if (GetLogExtraDebugStuff())
                 {
                     Console.WriteLine($"Saved config to {_configFilePath}");
@@ -629,11 +639,11 @@ namespace UGTLive
             catch (Exception ex)
             {
                 Console.WriteLine($"Error saving config: {ex.Message}");
-                MessageBox.Show($"Error saving configuration: {ex.Message}", "Configuration Error", 
+                MessageBox.Show($"Error saving configuration: {ex.Message}", "Configuration Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        
+
         // Determine if a key should be stored as multiline
         private bool ShouldBeMultiline(string key)
         {
@@ -648,7 +658,7 @@ namespace UGTLive
             {
                 return value;
             }
-            
+
             return defaultValue;
         }
 
@@ -663,44 +673,44 @@ namespace UGTLive
         {
             return GetValue(GEMINI_API_KEY);
         }
-        
+
         // Set Gemini API key
         public void SetGeminiApiKey(string apiKey)
         {
             _configValues[GEMINI_API_KEY] = apiKey;
             SaveConfig();
         }
-        
+
         // Get/Set Ollama URL
         public string GetOllamaUrl()
         {
             return GetValue(OLLAMA_URL, "http://localhost");
         }
-        
+
         public void SetOllamaUrl(string url)
         {
             _configValues[OLLAMA_URL] = url;
             SaveConfig();
         }
-        
+
         // Get/Set Ollama Port
         public string GetOllamaPort()
         {
             return GetValue(OLLAMA_PORT, "11434");
         }
-        
+
         public void SetOllamaPort(string port)
         {
             _configValues[OLLAMA_PORT] = port;
             SaveConfig();
         }
-        
+
         // Get/Set Ollama Model
         public string GetOllamaModel()
         {
             return GetValue(OLLAMA_MODEL, "llama3"); // Default to llama3
         }
-        
+
         public void SetOllamaModel(string model)
         {
             if (!string.IsNullOrWhiteSpace(model))
@@ -710,67 +720,67 @@ namespace UGTLive
                 Console.WriteLine($"Ollama model set to: {model}");
             }
         }
-        
+
         // Get the full Ollama API endpoint
         public string GetOllamaApiEndpoint()
         {
             string url = GetOllamaUrl();
             string port = GetOllamaPort();
-            
+
             // Ensure URL doesn't end with a slash
             if (url.EndsWith("/"))
             {
                 url = url.Substring(0, url.Length - 1);
             }
-            
+
             return $"{url}:{port}/api/generate";
         }
-        
+
         // Get/Set llama.cpp URL
         public string GetLlamaCppUrl()
         {
             return GetValue(LLAMACPP_URL, "http://localhost");
         }
-        
+
         public void SetLlamaCppUrl(string url)
         {
             _configValues[LLAMACPP_URL] = url;
             SaveConfig();
         }
-        
+
         // Get/Set llama.cpp Port
         public string GetLlamaCppPort()
         {
             return GetValue(LLAMACPP_PORT, "8080");
         }
-        
+
         public void SetLlamaCppPort(string port)
         {
             _configValues[LLAMACPP_PORT] = port;
             SaveConfig();
         }
-        
+
         // Get the full llama.cpp API endpoint
         public string GetLlamaCppApiEndpoint()
         {
             string url = GetLlamaCppUrl();
             string port = GetLlamaCppPort();
-            
+
             // Ensure URL doesn't end with a slash
             if (url.EndsWith("/"))
             {
                 url = url.Substring(0, url.Length - 1);
             }
-            
+
             return $"{url}:{port}/v1/chat/completions";
         }
-        
+
         // Get current translation service
         public string GetCurrentTranslationService()
         {
             return _currentTranslationService;
         }
-        
+
         // Set current translation service
         public void SetTranslationService(string service)
         {
@@ -786,22 +796,22 @@ namespace UGTLive
                 Console.WriteLine($"WARNING: Invalid translation service: '{service}'. Valid options are: Gemini, Ollama, ChatGPT, llama.cpp, Google Translate");
             }
         }
-        
+
         // Get current OCR method
         public string GetOcrMethod()
         {
             string ocrMethod = GetValue(OCR_METHOD, "Windows OCR"); // Default to Windows OCR if not set
-            
+
             // Normalize method name if it's one of the supported methods (handles case differences)
             var match = _supportedOcrMethods.FirstOrDefault(m => string.Equals(m, ocrMethod, StringComparison.OrdinalIgnoreCase));
             if (match != null)
             {
                 return match;
             }
-            
+
             return ocrMethod;
         }
-        
+
         // Set current OCR method
         public void SetOcrMethod(string method)
         {
@@ -824,8 +834,8 @@ namespace UGTLive
                 Console.WriteLine($"WARNING: Invalid OCR method: {method}. Supported methods: {string.Join(", ", _supportedOcrMethods)}");
             }
         }
-        
-        
+
+
         // Create service-specific config files if they don't exist
         private void EnsureServiceConfigFilesExist()
         {
@@ -833,12 +843,12 @@ namespace UGTLive
             {
                 // Default prompts for each service
                 string defaultPrompt = GetDefaultPrompt("");
-                
+
                 string defaultGeminiPrompt = defaultPrompt;
                 string defaultOllamaPrompt = defaultPrompt;
                 string defaultChatGptPrompt = defaultPrompt;
                 string defaultLlamaCppPrompt = defaultPrompt;
-                
+
                 // Check and create Gemini config file
                 if (!File.Exists(_geminiConfigFilePath))
                 {
@@ -846,7 +856,7 @@ namespace UGTLive
                     File.WriteAllText(_geminiConfigFilePath, geminiContent);
                     Console.WriteLine("Created default Gemini config file");
                 }
-                
+
                 // Check and create Ollama config file
                 if (!File.Exists(_ollamaConfigFilePath))
                 {
@@ -854,7 +864,7 @@ namespace UGTLive
                     File.WriteAllText(_ollamaConfigFilePath, ollamaContent);
                     Console.WriteLine("Created default Ollama config file");
                 }
-                
+
                 // Check and create ChatGPT config file
                 if (!File.Exists(_chatgptConfigFilePath))
                 {
@@ -862,7 +872,7 @@ namespace UGTLive
                     File.WriteAllText(_chatgptConfigFilePath, chatgptContent);
                     Console.WriteLine("Created default ChatGPT config file");
                 }
-                
+
                 // Check and create llama.cpp config file
                 if (!File.Exists(_llamacppConfigFilePath))
                 {
@@ -870,7 +880,7 @@ namespace UGTLive
                     File.WriteAllText(_llamacppConfigFilePath, llamacppContent);
                     Console.WriteLine("Created default llama.cpp config file");
                 }
-                
+
                 // Google Translate doesn't use prompts, so no need to create config file
             }
             catch (Exception ex)
@@ -878,13 +888,13 @@ namespace UGTLive
                 Console.WriteLine($"Error ensuring service config files: {ex.Message}");
             }
         }
-        
+
         // Get LLM Prompt from the current translation service
         public string GetLlmPrompt()
         {
             return GetServicePrompt(_currentTranslationService);
         }
-        
+
         // Get prompt for specific translation service
         public string GetServicePrompt(string service)
         {
@@ -893,9 +903,9 @@ namespace UGTLive
             {
                 return "";
             }
-            
+
             string filePath;
-            
+
             switch (service)
             {
                 case "Gemini":
@@ -914,23 +924,23 @@ namespace UGTLive
                     filePath = _geminiConfigFilePath;
                     break;
             }
-            
+
             try
             {
                 if (File.Exists(filePath))
                 {
                     string content = File.ReadAllText(filePath);
-                    
+
                     // Extract prompt text using regex
                     string pattern = @"<llm_prompt_multi_start>(.*?)<llm_prompt_multi_end>";
                     Match match = Regex.Match(content, pattern, RegexOptions.Singleline);
-                    
+
                     if (match.Success && match.Groups.Count >= 2)
                     {
                         return match.Groups[1].Value.Trim();
                     }
                 }
-                
+
                 // Return default prompt if file doesn't exist or prompt not found
                 return "You are a translator. Translate the text I'll provide into English. Keep it simple and conversational.";
             }
@@ -940,7 +950,7 @@ namespace UGTLive
                 return "Error loading prompt";
             }
         }
-        
+
         // Get default prompt for translation service
         public string GetDefaultPrompt(string service)
         {
@@ -949,7 +959,7 @@ namespace UGTLive
             {
                 return "";
             }
-            
+
             // All services use the same default prompt
             return @"Your task is to translate the source_language text in the following JSON data to target_language and output a new JSON in a specific format.  This is text from OCR of a screenshot from a video game, so please try to infer the context and which parts are menu or dialog. It might also be a webpage or manga, so just do your best.
 
@@ -970,7 +980,7 @@ Output text_block: {""id"": ""text_0"", ""text"": ""こんにちは"", ""rect"":
 
 Here is the input JSON:";
         }
-        
+
         // Save prompt for specific translation service
         public bool SaveServicePrompt(string service, string prompt)
         {
@@ -979,9 +989,9 @@ Here is the input JSON:";
             {
                 return true;
             }
-            
+
             string filePath;
-            
+
             switch (service)
             {
                 case "Gemini":
@@ -1000,7 +1010,7 @@ Here is the input JSON:";
                     filePath = _geminiConfigFilePath;
                     break;
             }
-            
+
             try
             {
                 string content = $"<llm_prompt_multi_start>\n{prompt}\n<llm_prompt_multi_end>";
@@ -1014,21 +1024,21 @@ Here is the input JSON:";
                 return false;
             }
         }
-        
+
         // Check if auto sizing text blocks is enabled
         public bool IsAutoSizeTextBlocksEnabled()
         {
             string value = GetValue(AUTO_SIZE_TEXT_BLOCKS, "true");
             return value.ToLower() == "true";
         }
-        
+
         // Check if auto translate is enabled
         public bool IsAutoTranslateEnabled()
         {
             string value = GetValue(AUTO_TRANSLATE_ENABLED, "false");
             return value.ToLower() == "true";
         }
-        
+
         // Set auto translate enabled
         public void SetAutoTranslateEnabled(bool enabled)
         {
@@ -1036,14 +1046,14 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"Auto translate enabled: {enabled}");
         }
-        
+
         // Check if pause OCR while translating is enabled
         public bool IsPauseOcrWhileTranslatingEnabled()
         {
             string value = GetValue(PAUSE_OCR_WHILE_TRANSLATING, "true");
             return value.ToLower() == "true";
         }
-        
+
         // Set pause OCR while translating enabled
         public void SetPauseOcrWhileTranslatingEnabled(bool enabled)
         {
@@ -1065,13 +1075,13 @@ Here is the input JSON:";
             _configValues[ENABLE_CLOUD_OCR_COLOR_CORRECTION] = enabled.ToString().ToLower();
             SaveConfig();
         }
-        
+
         // Get ChatBox font family
         public string GetChatBoxFontFamily()
         {
             return GetValue(CHATBOX_FONT_FAMILY, "Segoe UI");
         }
-        
+
         // Get ChatBox font size
         public double GetChatBoxFontSize()
         {
@@ -1082,7 +1092,7 @@ Here is the input JSON:";
             }
             return 14; // Default font size
         }
-        
+
         // Get ChatBox font color
         public System.Windows.Media.Color GetChatBoxFontColor()
         {
@@ -1092,19 +1102,19 @@ Here is the input JSON:";
                 if (value.StartsWith("#") && value.Length >= 7)
                 {
                     byte a = 255; // Default alpha is fully opaque
-                    
+
                     // Parse alpha if provided (#AARRGGBB format)
                     if (value.Length >= 9)
                     {
                         a = byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
                     }
-                    
+
                     // Parse RGB values
                     int offset = value.Length >= 9 ? 3 : 1;
                     byte r = byte.Parse(value.Substring(offset, 2), System.Globalization.NumberStyles.HexNumber);
                     byte g = byte.Parse(value.Substring(offset + 2, 2), System.Globalization.NumberStyles.HexNumber);
                     byte b = byte.Parse(value.Substring(offset + 4, 2), System.Globalization.NumberStyles.HexNumber);
-                    
+
                     return System.Windows.Media.Color.FromArgb(a, r, g, b);
                 }
             }
@@ -1112,11 +1122,11 @@ Here is the input JSON:";
             {
                 Console.WriteLine($"Error parsing ChatBox font color: {ex.Message}");
             }
-            
+
             // Return default color if parsing fails
             return System.Windows.Media.Colors.White;
         }
-        
+
         // Get ChatBox background color
         public System.Windows.Media.Color GetChatBoxBackgroundColor()
         {
@@ -1126,19 +1136,19 @@ Here is the input JSON:";
                 if (value.StartsWith("#") && value.Length >= 7)
                 {
                     byte a = 255; // Default alpha is fully opaque
-                    
+
                     // Parse alpha if provided (#AARRGGBB format)
                     if (value.Length >= 9)
                     {
                         a = byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
                     }
-                    
+
                     // Parse RGB values
                     int offset = value.Length >= 9 ? 3 : 1;
                     byte r = byte.Parse(value.Substring(offset, 2), System.Globalization.NumberStyles.HexNumber);
                     byte g = byte.Parse(value.Substring(offset + 2, 2), System.Globalization.NumberStyles.HexNumber);
                     byte b = byte.Parse(value.Substring(offset + 4, 2), System.Globalization.NumberStyles.HexNumber);
-                    
+
                     return System.Windows.Media.Color.FromArgb(a, r, g, b);
                 }
             }
@@ -1146,11 +1156,11 @@ Here is the input JSON:";
             {
                 Console.WriteLine($"Error parsing ChatBox background color: {ex.Message}");
             }
-            
+
             // Return default color if parsing fails
             return System.Windows.Media.Color.FromArgb(128, 0, 0, 0);
         }
-        
+
         // Get ChatBox window opacity (0.1 to 1.0)
         public double GetChatBoxWindowOpacity()
         {
@@ -1162,7 +1172,7 @@ Here is the input JSON:";
             }
             return 1.0; // Default opacity
         }
-        
+
         // Get ChatBox background opacity (0.0 to 1.0)
         public double GetChatBoxBackgroundOpacity()
         {
@@ -1173,7 +1183,7 @@ Here is the input JSON:";
             }
             return 0.5; // Default opacity
         }
-        
+
         // Get Original Text color
         public System.Windows.Media.Color GetOriginalTextColor()
         {
@@ -1183,19 +1193,19 @@ Here is the input JSON:";
                 if (value.StartsWith("#") && value.Length >= 7)
                 {
                     byte a = 255; // Default alpha is fully opaque
-                    
+
                     // Parse alpha if provided (#AARRGGBB format)
                     if (value.Length >= 9)
                     {
                         a = byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
                     }
-                    
+
                     // Parse RGB values
                     int offset = value.Length >= 9 ? 3 : 1;
                     byte r = byte.Parse(value.Substring(offset, 2), System.Globalization.NumberStyles.HexNumber);
                     byte g = byte.Parse(value.Substring(offset + 2, 2), System.Globalization.NumberStyles.HexNumber);
                     byte b = byte.Parse(value.Substring(offset + 4, 2), System.Globalization.NumberStyles.HexNumber);
-                    
+
                     return System.Windows.Media.Color.FromArgb(a, r, g, b);
                 }
             }
@@ -1203,11 +1213,11 @@ Here is the input JSON:";
             {
                 Console.WriteLine($"Error parsing Original Text color: {ex.Message}");
             }
-            
+
             // Return default color if parsing fails
             return System.Windows.Media.Colors.LightGoldenrodYellow;
         }
-        
+
         // Get Translated Text color
         public System.Windows.Media.Color GetTranslatedTextColor()
         {
@@ -1217,19 +1227,19 @@ Here is the input JSON:";
                 if (value.StartsWith("#") && value.Length >= 7)
                 {
                     byte a = 255; // Default alpha is fully opaque
-                    
+
                     // Parse alpha if provided (#AARRGGBB format)
                     if (value.Length >= 9)
                     {
                         a = byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
                     }
-                    
+
                     // Parse RGB values
                     int offset = value.Length >= 9 ? 3 : 1;
                     byte r = byte.Parse(value.Substring(offset, 2), System.Globalization.NumberStyles.HexNumber);
                     byte g = byte.Parse(value.Substring(offset + 2, 2), System.Globalization.NumberStyles.HexNumber);
                     byte b = byte.Parse(value.Substring(offset + 4, 2), System.Globalization.NumberStyles.HexNumber);
-                    
+
                     return System.Windows.Media.Color.FromArgb(a, r, g, b);
                 }
             }
@@ -1237,11 +1247,11 @@ Here is the input JSON:";
             {
                 Console.WriteLine($"Error parsing Translated Text color: {ex.Message}");
             }
-            
+
             // Return default color if parsing fails
             return System.Windows.Media.Colors.White;
         }
-        
+
         // Get ChatBox history size
         public int GetChatBoxHistorySize()
         {
@@ -1252,7 +1262,7 @@ Here is the input JSON:";
             }
             return 20; // Default history size
         }
-        
+
         // Get min ChatBox text size
         public int GetChatBoxMinTextSize()
         {
@@ -1263,7 +1273,7 @@ Here is the input JSON:";
             }
             return 2; // Default min size
         }
-        
+
         // Set min ChatBox text size
         public void SetChatBoxMinTextSize(int value)
         {
@@ -1274,7 +1284,7 @@ Here is the input JSON:";
                 Console.WriteLine($"Min ChatBox text size set to: {value}");
             }
         }
-        
+
         // Get/Set translation context settings
         public int GetMaxContextPieces()
         {
@@ -1285,7 +1295,7 @@ Here is the input JSON:";
             }
             return 3; // Default: 3 context pieces
         }
-        
+
         public void SetMaxContextPieces(int value)
         {
             if (value >= 0)
@@ -1295,7 +1305,7 @@ Here is the input JSON:";
                 Console.WriteLine($"Max context pieces set to: {value}");
             }
         }
-        
+
         public int GetMinContextSize()
         {
             string value = GetValue(MIN_CONTEXT_SIZE, "20"); // Default: 20 characters
@@ -1305,7 +1315,7 @@ Here is the input JSON:";
             }
             return 20; // Default: 20 characters
         }
-        
+
         public void SetMinContextSize(int value)
         {
             if (value >= 0)
@@ -1315,20 +1325,20 @@ Here is the input JSON:";
                 Console.WriteLine($"Min context size set to: {value}");
             }
         }
-        
+
         // Get/Set game info
         public string GetGameInfo()
         {
             return GetValue(GAME_INFO, "");
         }
-        
+
         public void SetGameInfo(string gameInfo)
         {
             _configValues[GAME_INFO] = gameInfo;
             SaveConfig();
             Console.WriteLine($"Game info set to: {gameInfo}");
         }
-        
+
         // Get/Set minimum text fragment size
         public int GetMinTextFragmentSize()
         {
@@ -1339,7 +1349,7 @@ Here is the input JSON:";
             }
             return 2; // Default: 2 characters
         }
-        
+
         public void SetMinTextFragmentSize(int value)
         {
             if (value >= 0)
@@ -1349,7 +1359,7 @@ Here is the input JSON:";
                 Console.WriteLine($"Minimum text fragment size set to: {value}");
             }
         }
-        
+
         // Get/Set minimum letter confidence (Global - Legacy/Default)
         public double GetMinLetterConfidence()
         {
@@ -1360,7 +1370,7 @@ Here is the input JSON:";
             }
             return 0.1; // Default: 0.1 (10%)
         }
-        
+
         // Get minimum letter confidence for specific provider
         public double GetMinLetterConfidence(string provider)
         {
@@ -1369,7 +1379,7 @@ Here is the input JSON:";
             // Clean provider name for key (e.g. "EasyOCR" -> "easyocr", "Windows OCR" -> "windows_ocr")
             string keySuffix = provider.ToLower().Replace(" ", "_");
             string key = MIN_LETTER_CONFIDENCE_PREFIX + keySuffix;
-            
+
             // Determine default value based on provider
             string defaultValue;
             if (keySuffix == "google_vision")
@@ -1381,14 +1391,14 @@ Here is the input JSON:";
                 // For other providers, default value depends on legacy global setting
                 defaultValue = GetValue(MIN_LETTER_CONFIDENCE, "0.1");
             }
-            
+
             string value = GetValue(key, defaultValue);
-            
+
             if (double.TryParse(value, out double minConfidence) && minConfidence >= 0 && minConfidence <= 1)
             {
                 return minConfidence;
             }
-            
+
             if (keySuffix == "google_vision") return 0.7;
             return 0.1;
         }
@@ -1406,22 +1416,22 @@ Here is the input JSON:";
                 Console.WriteLine($"Invalid minimum letter confidence: {value}. Must be between 0 and 1.");
             }
         }
-        
+
         public void SetMinLetterConfidence(string provider, double value)
         {
             if (string.IsNullOrEmpty(provider)) return;
-            
+
             if (value >= 0 && value <= 1)
             {
                 string keySuffix = provider.ToLower().Replace(" ", "_");
                 string key = MIN_LETTER_CONFIDENCE_PREFIX + keySuffix;
-                
+
                 _configValues[key] = value.ToString();
                 SaveConfig();
                 Console.WriteLine($"Minimum letter confidence for {provider} set to: {value}");
             }
         }
-        
+
         // Get/Set minimum line confidence (Global - Legacy/Default)
         public double GetMinLineConfidence()
         {
@@ -1440,7 +1450,7 @@ Here is the input JSON:";
 
             string keySuffix = provider.ToLower().Replace(" ", "_");
             string key = MIN_LINE_CONFIDENCE_PREFIX + keySuffix;
-            
+
             // Determine default value based on provider
             string defaultValue;
             if (keySuffix == "google_vision")
@@ -1452,18 +1462,18 @@ Here is the input JSON:";
                 // Default to global setting for others
                 defaultValue = GetValue(MIN_LINE_CONFIDENCE, "0.2");
             }
-            
+
             string value = GetValue(key, defaultValue);
-            
+
             if (double.TryParse(value, out double minConfidence) && minConfidence >= 0 && minConfidence <= 1)
             {
                 return minConfidence;
             }
-            
+
             if (keySuffix == "google_vision") return 0.7;
             return 0.2;
         }
-        
+
         public void SetMinLineConfidence(double value)
         {
             if (value >= 0 && value <= 1)
@@ -1492,13 +1502,13 @@ Here is the input JSON:";
                 Console.WriteLine($"Minimum line confidence for {provider} set to: {value}");
             }
         }
-        
+
         // Get/Set source language
         public string GetSourceLanguage()
         {
             return GetValue(SOURCE_LANGUAGE, "ja"); // Default to Japanese
         }
-        
+
         public void SetSourceLanguage(string language)
         {
             if (!string.IsNullOrWhiteSpace(language))
@@ -1508,13 +1518,13 @@ Here is the input JSON:";
                 Console.WriteLine($"Source language set to: {language}");
             }
         }
-        
+
         // Get/Set target language
         public string GetTargetLanguage()
         {
             return GetValue(TARGET_LANGUAGE, "en"); // Default to English
         }
-        
+
         public void SetTargetLanguage(string language)
         {
             if (!string.IsNullOrWhiteSpace(language))
@@ -1524,29 +1534,29 @@ Here is the input JSON:";
                 Console.WriteLine($"Target language set to: {language}");
             }
         }
-        
+
         // Text-to-Speech methods
-        
+
         // Get/Set TTS enabled
         public bool IsTtsEnabled()
         {
             string value = GetValue(TTS_ENABLED, "false");
             return value.ToLower() == "true";
         }
-        
+
         public void SetTtsEnabled(bool enabled)
         {
             _configValues[TTS_ENABLED] = enabled.ToString().ToLower();
             SaveConfig();
             Console.WriteLine($"TTS enabled: {enabled}");
         }
-        
+
         // Get/Set TTS service
         public string GetTtsService()
         {
             return GetValue(TTS_SERVICE, "ElevenLabs"); // Default to ElevenLabs
         }
-        
+
         public void SetTtsService(string service)
         {
             if (!string.IsNullOrWhiteSpace(service))
@@ -1556,26 +1566,26 @@ Here is the input JSON:";
                 Console.WriteLine($"TTS service set to: {service}");
             }
         }
-        
+
         // Get/Set ElevenLabs API key
         public string GetElevenLabsApiKey()
         {
             return GetValue(ELEVENLABS_API_KEY, "");
         }
-        
+
         public void SetElevenLabsApiKey(string apiKey)
         {
             _configValues[ELEVENLABS_API_KEY] = apiKey;
             SaveConfig();
             Console.WriteLine("ElevenLabs API key updated");
         }
-        
+
         // Get/Set ElevenLabs voice
         public string GetElevenLabsVoice()
         {
             return GetValue(ELEVENLABS_VOICE, "21m00Tcm4TlvDq8ikWAM"); // Default to Rachel
         }
-        
+
         public void SetElevenLabsVoice(string voiceId)
         {
             if (!string.IsNullOrWhiteSpace(voiceId))
@@ -1611,28 +1621,28 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine("ElevenLabs custom voice ID updated");
         }
-        
+
         // Google TTS methods
-        
+
         // Get/Set Google TTS API key
         public string GetGoogleTtsApiKey()
         {
             return GetValue(GOOGLE_TTS_API_KEY, "");
         }
-        
+
         public void SetGoogleTtsApiKey(string apiKey)
         {
             _configValues[GOOGLE_TTS_API_KEY] = apiKey;
             SaveConfig();
             Console.WriteLine("Google TTS API key updated");
         }
-        
+
         // Get/Set Google TTS voice
         public string GetGoogleTtsVoice()
         {
             return GetValue(GOOGLE_TTS_VOICE, "ja-JP-Neural2-B"); // Default to Female - Neural2
         }
-        
+
         public void SetGoogleTtsVoice(string voiceId)
         {
             if (!string.IsNullOrWhiteSpace(voiceId))
@@ -1642,15 +1652,15 @@ Here is the input JSON:";
                 Console.WriteLine($"Google TTS voice set to: {voiceId}");
             }
         }
-        
+
         // TTS Preload methods
-        
+
         // Get/Set TTS Source Service
         public string GetTtsSourceService()
         {
             return GetValue(TTS_SOURCE_SERVICE, GetTtsService()); // Default to main TTS service
         }
-        
+
         public void SetTtsSourceService(string service)
         {
             if (!string.IsNullOrWhiteSpace(service))
@@ -1660,13 +1670,13 @@ Here is the input JSON:";
                 Console.WriteLine($"TTS source service set to: {service}");
             }
         }
-        
+
         // Get/Set TTS Source Voice
         public string GetTtsSourceVoice()
         {
             return GetValue(TTS_SOURCE_VOICE, GetGoogleTtsVoice()); // Default to Google TTS voice
         }
-        
+
         public void SetTtsSourceVoice(string voiceId)
         {
             if (!string.IsNullOrWhiteSpace(voiceId))
@@ -1676,39 +1686,39 @@ Here is the input JSON:";
                 Console.WriteLine($"TTS source voice set to: {voiceId}");
             }
         }
-        
+
         // Get/Set TTS Source Use Custom Voice ID
         public bool GetTtsSourceUseCustomVoiceId()
         {
             return GetBoolValue(TTS_SOURCE_USE_CUSTOM_VOICE_ID, false);
         }
-        
+
         public void SetTtsSourceUseCustomVoiceId(bool useCustom)
         {
             _configValues[TTS_SOURCE_USE_CUSTOM_VOICE_ID] = useCustom.ToString().ToLower();
             SaveConfig();
             Console.WriteLine($"TTS source use custom voice ID: {useCustom}");
         }
-        
+
         // Get/Set TTS Source Custom Voice ID
         public string GetTtsSourceCustomVoiceId()
         {
             return GetValue(TTS_SOURCE_CUSTOM_VOICE_ID, "");
         }
-        
+
         public void SetTtsSourceCustomVoiceId(string voiceId)
         {
             _configValues[TTS_SOURCE_CUSTOM_VOICE_ID] = voiceId ?? "";
             SaveConfig();
             Console.WriteLine("TTS source custom voice ID updated");
         }
-        
+
         // Get/Set TTS Target Service
         public string GetTtsTargetService()
         {
             return GetValue(TTS_TARGET_SERVICE, GetTtsService()); // Default to main TTS service
         }
-        
+
         public void SetTtsTargetService(string service)
         {
             if (!string.IsNullOrWhiteSpace(service))
@@ -1718,13 +1728,13 @@ Here is the input JSON:";
                 Console.WriteLine($"TTS target service set to: {service}");
             }
         }
-        
+
         // Get/Set TTS Target Voice
         public string GetTtsTargetVoice()
         {
             return GetValue(TTS_TARGET_VOICE, "en-US-Studio-O"); // Default to English Studio voice
         }
-        
+
         public void SetTtsTargetVoice(string voiceId)
         {
             if (!string.IsNullOrWhiteSpace(voiceId))
@@ -1734,52 +1744,52 @@ Here is the input JSON:";
                 Console.WriteLine($"TTS target voice set to: {voiceId}");
             }
         }
-        
+
         // Get/Set TTS Target Use Custom Voice ID
         public bool GetTtsTargetUseCustomVoiceId()
         {
             return GetBoolValue(TTS_TARGET_USE_CUSTOM_VOICE_ID, false);
         }
-        
+
         public void SetTtsTargetUseCustomVoiceId(bool useCustom)
         {
             _configValues[TTS_TARGET_USE_CUSTOM_VOICE_ID] = useCustom.ToString().ToLower();
             SaveConfig();
             Console.WriteLine($"TTS target use custom voice ID: {useCustom}");
         }
-        
+
         // Get/Set TTS Target Custom Voice ID
         public string GetTtsTargetCustomVoiceId()
         {
             return GetValue(TTS_TARGET_CUSTOM_VOICE_ID, "");
         }
-        
+
         public void SetTtsTargetCustomVoiceId(string voiceId)
         {
             _configValues[TTS_TARGET_CUSTOM_VOICE_ID] = voiceId ?? "";
             SaveConfig();
             Console.WriteLine("TTS target custom voice ID updated");
         }
-        
+
         // Get/Set TTS Preload Enabled
         public bool IsTtsPreloadEnabled()
         {
             return GetBoolValue(TTS_PRELOAD_ENABLED, false);
         }
-        
+
         public void SetTtsPreloadEnabled(bool enabled)
         {
             _configValues[TTS_PRELOAD_ENABLED] = enabled.ToString().ToLower();
             SaveConfig();
             Console.WriteLine($"TTS preload enabled: {enabled}");
         }
-        
+
         // Get/Set TTS Preload Mode
         public string GetTtsPreloadMode()
         {
             return GetValue(TTS_PRELOAD_MODE, "Source language");
         }
-        
+
         public void SetTtsPreloadMode(string mode)
         {
             if (!string.IsNullOrWhiteSpace(mode))
@@ -1789,13 +1799,13 @@ Here is the input JSON:";
                 Console.WriteLine($"TTS preload mode set to: {mode}");
             }
         }
-        
+
         // Get/Set TTS Play Order
         public string GetTtsPlayOrder()
         {
             return GetValue(TTS_PLAY_ORDER, "Top down, left to right");
         }
-        
+
         public void SetTtsPlayOrder(string order)
         {
             if (!string.IsNullOrWhiteSpace(order))
@@ -1805,33 +1815,33 @@ Here is the input JSON:";
                 Console.WriteLine($"TTS play order set to: {order}");
             }
         }
-        
+
         // Get/Set TTS Auto Play All
         public bool IsTtsAutoPlayAllEnabled()
         {
             return GetBoolValue(TTS_AUTO_PLAY_ALL, false);
         }
-        
+
         public void SetTtsAutoPlayAllEnabled(bool enabled)
         {
             _configValues[TTS_AUTO_PLAY_ALL] = enabled.ToString().ToLower();
             SaveConfig();
             Console.WriteLine($"TTS auto play all enabled: {enabled}");
         }
-        
+
         // Get/Set TTS Delete Cache On Startup
         public bool GetTtsDeleteCacheOnStartup()
         {
             return GetBoolValue(TTS_DELETE_CACHE_ON_STARTUP, false);
         }
-        
+
         public void SetTtsDeleteCacheOnStartup(bool enabled)
         {
             _configValues[TTS_DELETE_CACHE_ON_STARTUP] = enabled.ToString().ToLower();
             SaveConfig();
             Console.WriteLine($"TTS delete cache on startup: {enabled}");
         }
-        
+
         // Get/Set TTS Vertical Overlap Threshold (in pixels)
         public double GetTtsVerticalOverlapThreshold()
         {
@@ -1842,14 +1852,14 @@ Here is the input JSON:";
             }
             return 120.0; // Default to 120 pixels
         }
-        
+
         public void SetTtsVerticalOverlapThreshold(double threshold)
         {
             _configValues[TTS_VERTICAL_OVERLAP_THRESHOLD] = threshold.ToString();
             SaveConfig();
             Console.WriteLine($"TTS vertical overlap threshold set to: {threshold} pixels");
         }
-        
+
         // Get/Set TTS Max Concurrent Downloads
         public int GetTtsMaxConcurrentDownloads()
         {
@@ -1860,7 +1870,7 @@ Here is the input JSON:";
             }
             return 2; // Default to 2 concurrent downloads
         }
-        
+
         public void SetTtsMaxConcurrentDownloads(int maxConcurrent)
         {
             if (maxConcurrent < 0)
@@ -1871,28 +1881,28 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"TTS max concurrent downloads set to: {maxConcurrent}{(maxConcurrent == 0 ? " (unlimited)" : "")}");
         }
-        
+
         // ChatGPT methods
-        
+
         // Get/Set ChatGPT API key
         public string GetChatGptApiKey()
         {
             return GetValue(CHATGPT_API_KEY, "");
         }
-        
+
         public void SetChatGptApiKey(string apiKey)
         {
             _configValues[CHATGPT_API_KEY] = apiKey;
             SaveConfig();
             Console.WriteLine("ChatGPT API key updated");
         }
-        
+
         // Get/Set ChatGPT model
         public string GetChatGptModel()
         {
             return GetValue(CHATGPT_MODEL, "gpt-3.5-turbo"); // Default to gpt-3.5-turbo
         }
-        
+
         public void SetChatGptModel(string model)
         {
             if (!string.IsNullOrWhiteSpace(model))
@@ -1902,7 +1912,7 @@ Here is the input JSON:";
                 Console.WriteLine($"ChatGPT model set to: {model}");
             }
         }
-        
+
         // Get/Set ChatGPT max completion tokens
         public int GetChatGptMaxCompletionTokens()
         {
@@ -1913,7 +1923,7 @@ Here is the input JSON:";
             }
             return 32768; // Default: 32768 tokens
         }
-        
+
         public void SetChatGptMaxCompletionTokens(int tokens)
         {
             if (tokens > 0)
@@ -1927,15 +1937,15 @@ Here is the input JSON:";
                 Console.WriteLine($"Invalid ChatGPT max completion tokens: {tokens}. Must be greater than 0.");
             }
         }
-        
+
         // Gemini methods
-        
+
         // Get Gemini model
         public string GetGeminiModel()
         {
             return GetValue(GEMINI_MODEL, "gemini-2.5-flash"); // Default to 2.0 Flash
         }
-        
+
         // Set Gemini model
         public void SetGeminiModel(string model)
         {
@@ -1946,16 +1956,16 @@ Here is the input JSON:";
                 Console.WriteLine($"Gemini model set to: {model}");
             }
         }
-        
+
         // OCR Display methods
-        
+
         // Check if translation should stay onscreen until replaced
         public bool IsLeaveTranslationOnscreenEnabled()
         {
             string value = GetValue(LEAVE_TRANSLATION_ONSCREEN, "false");
             return value.ToLower() == "true";
         }
-        
+
         // Set whether translation should stay onscreen until replaced
         public void SetLeaveTranslationOnscreenEnabled(bool enabled)
         {
@@ -1963,14 +1973,14 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"Leave translation onscreen enabled: {enabled}");
         }
-        
+
         // Check if translated text should be kept until replaced
         public bool IsKeepTranslatedTextUntilReplacedEnabled()
         {
             string value = GetValue(KEEP_TRANSLATED_TEXT_UNTIL_REPLACED, "true");
             return value.ToLower() == "true";
         }
-        
+
         // Set whether translated text should be kept until replaced
         public void SetKeepTranslatedTextUntilReplacedEnabled(bool enabled)
         {
@@ -1978,9 +1988,9 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"Keep translated text until replaced enabled: {enabled}");
         }
-        
+
         // Block Detection methods
-        
+
         // Get Block Detection Scale
         public double GetBlockDetectionScale()
         {
@@ -1991,7 +2001,7 @@ Here is the input JSON:";
             }
             return 5.0; // Default
         }
-        
+
         // Set Block Detection Scale
         public void SetBlockDetectionScale(double scale)
         {
@@ -2002,7 +2012,7 @@ Here is the input JSON:";
                 Console.WriteLine($"Block detection scale set to: {scale:F2}");
             }
         }
-        
+
         // Get Block Detection Settle Time
         public double GetBlockDetectionSettleTime()
         {
@@ -2013,7 +2023,7 @@ Here is the input JSON:";
             }
             return 0.15; // Default
         }
-        
+
         // Set Block Detection Settle Time
         public void SetBlockDetectionSettleTime(double seconds)
         {
@@ -2046,7 +2056,7 @@ Here is the input JSON:";
                 Console.WriteLine($"Block detection max settle time set to: {seconds:F2} seconds");
             }
         }
-        
+
         // Get Overlay Clear Delay
         public double GetOverlayClearDelaySeconds()
         {
@@ -2057,7 +2067,7 @@ Here is the input JSON:";
             }
             return 0.3; // Default
         }
-        
+
         // Set Overlay Clear Delay
         public void SetOverlayClearDelaySeconds(double seconds)
         {
@@ -2068,14 +2078,14 @@ Here is the input JSON:";
                 Console.WriteLine($"Overlay clear delay set to: {seconds:F2} seconds");
             }
         }
-        
+
         // Get Snapshot Toggle Mode (if true, pressing snapshot while overlay is displayed clears it)
         public bool GetSnapshotToggleMode()
         {
             string value = GetValue(SNAPSHOT_TOGGLE_MODE, "true");
             return value.ToLower() == "true";
         }
-        
+
         // Set Snapshot Toggle Mode
         public void SetSnapshotToggleMode(bool enabled)
         {
@@ -2083,7 +2093,7 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"Snapshot toggle mode: {enabled}");
         }
-        
+
         // Get/Set: Glue docTR lines into paragraphs
         // Get/Set: Manga OCR minimum region width
         public int GetMangaOcrMinRegionWidth()
@@ -2199,7 +2209,7 @@ Here is the input JSON:";
 
         // Get/Set: OCR processing mode (Deprecated/Removed)
         // Logic now handled automatically by UniversalBlockDetector
-        
+
         // Get all ignore phrases as a list of tuples (phrase, exactMatch)
 
         //OPTIMIZE:  Why is the AI doing all this work over and over?  Should be caching the results
@@ -2207,7 +2217,7 @@ Here is the input JSON:";
         {
             List<(string, bool)> result = new List<(string, bool)>();
             string value = GetValue(IGNORE_PHRASES, "");
-            
+
             if (!string.IsNullOrEmpty(value))
             {
                 // Fix the format if it contains the key prefix (from old format)
@@ -2215,10 +2225,10 @@ Here is the input JSON:";
                 {
                     value = value.Substring((IGNORE_PHRASES + "|").Length);
                 }
-                
+
                 // Format should be: phrase1|True|phrase2|False
                 string[] parts = value.Split('|');
-                
+
                 // Process in pairs
                 for (int i = 0; i < parts.Length - 1; i += 2)
                 {
@@ -2226,7 +2236,7 @@ Here is the input JSON:";
                     {
                         string phrase = parts[i];
                         bool exactMatch = bool.TryParse(parts[i + 1], out bool match) && match;
-                        
+
                         if (!string.IsNullOrEmpty(phrase))
                         {
                             result.Add((phrase, exactMatch));
@@ -2235,15 +2245,15 @@ Here is the input JSON:";
                     }
                 }
             }
-            
+
             return result;
         }
-        
+
         // Save all ignore phrases
         public void SaveIgnorePhrases(List<(string Phrase, bool ExactMatch)> phrases)
         {
             StringBuilder sb = new StringBuilder();
-            
+
             foreach (var (phrase, exactMatch) in phrases)
             {
                 if (!string.IsNullOrEmpty(phrase))
@@ -2254,20 +2264,20 @@ Here is the input JSON:";
                     sb.Append('|');
                 }
             }
-            
+
             _configValues[IGNORE_PHRASES] = sb.ToString();
             SaveConfig();
             Console.WriteLine($"Saved {phrases.Count} ignore phrases: {sb.ToString()}");
         }
-        
+
         // Add a single ignore phrase
         public void AddIgnorePhrase(string phrase, bool exactMatch)
         {
             if (string.IsNullOrEmpty(phrase))
                 return;
-                
+
             var phrases = GetIgnorePhrases();
-            
+
             // Check if the phrase already exists
             if (!phrases.Any(p => p.Phrase == phrase))
             {
@@ -2276,33 +2286,33 @@ Here is the input JSON:";
                 Console.WriteLine($"Added ignore phrase: '{phrase}' (Exact Match: {exactMatch})");
             }
         }
-        
+
         // Remove a single ignore phrase
         public void RemoveIgnorePhrase(string phrase)
         {
             if (string.IsNullOrEmpty(phrase))
                 return;
-                
+
             var phrases = GetIgnorePhrases();
             var originalCount = phrases.Count;
-            
+
             phrases.RemoveAll(p => p.Phrase == phrase);
-            
+
             if (phrases.Count < originalCount)
             {
                 SaveIgnorePhrases(phrases);
                 Console.WriteLine($"Removed ignore phrase: '{phrase}'");
             }
         }
-        
+
         // Update exact match setting for a phrase
         public void UpdateIgnorePhraseExactMatch(string phrase, bool exactMatch)
         {
             if (string.IsNullOrEmpty(phrase))
                 return;
-                
+
             var phrases = GetIgnorePhrases();
-            
+
             for (int i = 0; i < phrases.Count; i++)
             {
                 if (phrases[i].Phrase == phrase)
@@ -2386,13 +2396,13 @@ Here is the input JSON:";
 
         // Per-OCR settings methods
         // These allow storing horizontal glue, vertical glue, keep linefeeds, and leave translation onscreen settings per OCR method
-        
+
         // Helper method to normalize OCR method names for config keys
         private string NormalizeOcrMethodName(string ocrMethod)
         {
             return ocrMethod.Replace(" ", "_").ToLower();
         }
-        
+
         // Horizontal Glue (per-OCR)
         public double GetHorizontalGlue(string ocrMethod)
         {
@@ -2405,7 +2415,7 @@ Here is the input JSON:";
             }
             return 1.0;
         }
-        
+
         public void SetHorizontalGlue(string ocrMethod, double value)
         {
             string normalizedMethod = NormalizeOcrMethodName(ocrMethod);
@@ -2414,7 +2424,7 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"{ocrMethod} horizontal glue updated to {value}");
         }
-        
+
         // Vertical Glue (per-OCR)
         public double GetVerticalGlue(string ocrMethod)
         {
@@ -2427,7 +2437,7 @@ Here is the input JSON:";
             }
             return 1.0;
         }
-        
+
         public void SetVerticalGlue(string ocrMethod, double value)
         {
             string normalizedMethod = NormalizeOcrMethodName(ocrMethod);
@@ -2436,7 +2446,7 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"{ocrMethod} vertical glue updated to {value}");
         }
-        
+
         // Vertical Glue Overlap (per-OCR)
         public double GetVerticalGlueOverlap(string ocrMethod)
         {
@@ -2449,7 +2459,7 @@ Here is the input JSON:";
             }
             return 20.0;
         }
-        
+
         public void SetVerticalGlueOverlap(string ocrMethod, double value)
         {
             string normalizedMethod = NormalizeOcrMethodName(ocrMethod);
@@ -2458,27 +2468,27 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"{ocrMethod} vertical glue overlap updated to {value}");
         }
-        
+
         // Height Similarity (per-OCR)
         public double GetHeightSimilarity(string ocrMethod)
         {
             string normalizedMethod = NormalizeOcrMethodName(ocrMethod);
             string key = HEIGHT_SIMILARITY_PREFIX + normalizedMethod;
-            
+
             // Windows OCR returns word-level results (not character-level), so it needs a lower default
             // to allow more height variation between words
             string defaultValue = normalizedMethod == "windows_ocr" ? "10.0" : "50.0";
-            
+
             string value = GetValue(key, defaultValue);
             if (double.TryParse(value, out double result))
             {
                 return result;
             }
-            
+
             // Fallback defaults
             return normalizedMethod == "windows_ocr" ? 10.0 : 50.0;
         }
-        
+
         public void SetHeightSimilarity(string ocrMethod, double value)
         {
             string normalizedMethod = NormalizeOcrMethodName(ocrMethod);
@@ -2487,7 +2497,7 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"{ocrMethod} height similarity updated to {value}");
         }
-        
+
         // Keep Linefeeds (per-OCR)
         public bool GetKeepLinefeeds(string ocrMethod)
         {
@@ -2495,7 +2505,7 @@ Here is the input JSON:";
             string key = KEEP_LINEFEEDS_PREFIX + normalizedMethod;
             return GetBoolValue(key, true); // Default to true
         }
-        
+
         public void SetKeepLinefeeds(string ocrMethod, bool value)
         {
             string normalizedMethod = NormalizeOcrMethodName(ocrMethod);
@@ -2504,19 +2514,19 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"{ocrMethod} keep linefeeds set to: {value}");
         }
-        
+
         // Leave Translation Onscreen (per-OCR)
         public bool GetLeaveTranslationOnscreen(string ocrMethod)
         {
             string normalizedMethod = NormalizeOcrMethodName(ocrMethod);
             string key = LEAVE_TRANSLATION_ONSCREEN_PREFIX + normalizedMethod;
-            
+
             // Default is true for all OCR methods except MangaOCR
             bool defaultValue = !ocrMethod.Equals("MangaOCR", StringComparison.OrdinalIgnoreCase);
-            
+
             return GetBoolValue(key, defaultValue);
         }
-        
+
         public void SetLeaveTranslationOnscreen(string ocrMethod, bool value)
         {
             string normalizedMethod = NormalizeOcrMethodName(ocrMethod);
@@ -2672,7 +2682,7 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine("OpenAI speech prompt updated");
         }
-        
+
         // Reset OpenAI speech prompt to default
         public void ResetOpenAISpeechPromptToDefault()
         {
@@ -2700,7 +2710,7 @@ Here is the input JSON:";
         // Get/Set OpenAI Silence Duration
         public int GetOpenAiSilenceDurationMs()
         {
-            string value = GetValue(OPENAI_SILENCE_DURATION_MS, "250"); 
+            string value = GetValue(OPENAI_SILENCE_DURATION_MS, "250");
             if (int.TryParse(value, out int duration) && duration >= 0)
             {
                 return duration;
@@ -2723,7 +2733,7 @@ Here is the input JSON:";
         }
 
         // Monitor Window Override Color methods
-        
+
         // Get/Set Monitor Override BG Color Enabled
         public bool IsMonitorOverrideBgColorEnabled()
         {
@@ -2746,19 +2756,19 @@ Here is the input JSON:";
                 if (value.StartsWith("#") && value.Length >= 7)
                 {
                     byte a = 255; // Default alpha is fully opaque
-                    
+
                     // Parse alpha if provided (#AARRGGBB format)
                     if (value.Length >= 9)
                     {
                         a = byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
                     }
-                    
+
                     // Parse RGB values
                     int offset = value.Length >= 9 ? 3 : 1;
                     byte r = byte.Parse(value.Substring(offset, 2), System.Globalization.NumberStyles.HexNumber);
                     byte g = byte.Parse(value.Substring(offset + 2, 2), System.Globalization.NumberStyles.HexNumber);
                     byte b = byte.Parse(value.Substring(offset + 4, 2), System.Globalization.NumberStyles.HexNumber);
-                    
+
                     return System.Windows.Media.Color.FromArgb(a, r, g, b);
                 }
             }
@@ -2766,7 +2776,7 @@ Here is the input JSON:";
             {
                 Console.WriteLine($"Error parsing Monitor override BG color: {ex.Message}");
             }
-            
+
             // Return default color if parsing fails
             return System.Windows.Media.Colors.Black;
         }
@@ -2826,19 +2836,19 @@ Here is the input JSON:";
                 if (value.StartsWith("#") && value.Length >= 7)
                 {
                     byte a = 255; // Default alpha is fully opaque
-                    
+
                     // Parse alpha if provided (#AARRGGBB format)
                     if (value.Length >= 9)
                     {
                         a = byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
                     }
-                    
+
                     // Parse RGB values
                     int offset = value.Length >= 9 ? 3 : 1;
                     byte r = byte.Parse(value.Substring(offset, 2), System.Globalization.NumberStyles.HexNumber);
                     byte g = byte.Parse(value.Substring(offset + 2, 2), System.Globalization.NumberStyles.HexNumber);
                     byte b = byte.Parse(value.Substring(offset + 4, 2), System.Globalization.NumberStyles.HexNumber);
-                    
+
                     return System.Windows.Media.Color.FromArgb(a, r, g, b);
                 }
             }
@@ -2846,7 +2856,7 @@ Here is the input JSON:";
             {
                 Console.WriteLine($"Error parsing Monitor override font color: {ex.Message}");
             }
-            
+
             // Return default color if parsing fails
             return System.Windows.Media.Colors.White;
         }
@@ -2857,6 +2867,88 @@ Here is the input JSON:";
             _configValues[MONITOR_OVERRIDE_FONT_COLOR] = hexColor;
             SaveConfig();
             Console.WriteLine($"Monitor override font color set to: {hexColor}");
+        }
+
+        // Main Window Border Color methods
+
+        // Get/Set Main Window Override Border Color Enabled
+        public bool IsMainWindowOverrideBorderColorEnabled()
+        {
+            return GetBoolValue(MAIN_WINDOW_OVERRIDE_BORDER_COLOR_ENABLED, false);
+        }
+
+        public void SetMainWindowOverrideBorderColorEnabled(bool enabled)
+        {
+            _configValues[MAIN_WINDOW_OVERRIDE_BORDER_COLOR_ENABLED] = enabled.ToString().ToLower();
+            SaveConfig();
+            Console.WriteLine($"Main window override border color enabled: {enabled}");
+        }
+
+        // Get/Set Main Window Override Border Color
+        public System.Windows.Media.Color GetMainWindowOverrideBorderColor()
+        {
+            string value = GetValue(MAIN_WINDOW_OVERRIDE_BORDER_COLOR, "#CFFF0000"); // Default: Red
+            try
+            {
+                if (value.StartsWith("#") && value.Length >= 7)
+                {
+                    byte a = 255; // Default alpha is fully opaque
+
+                    // Parse alpha if provided (#AARRGGBB format)
+                    if (value.Length >= 9)
+                    {
+                        a = byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+                    }
+
+                    // Parse RGB values
+                    int offset = value.Length >= 9 ? 3 : 1;
+                    byte r = byte.Parse(value.Substring(offset, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte g = byte.Parse(value.Substring(offset + 2, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte b = byte.Parse(value.Substring(offset + 4, 2), System.Globalization.NumberStyles.HexNumber);
+
+                    return System.Windows.Media.Color.FromArgb(a, r, g, b);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error parsing Main window override border color: {ex.Message}");
+            }
+
+            // Return default color if parsing fails
+            return System.Windows.Media.Color.FromArgb(207, 255, 0, 0); // Default red
+        }
+
+        public void SetMainWindowOverrideBorderColor(System.Windows.Media.Color color)
+        {
+            string hexColor = $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}";
+            _configValues[MAIN_WINDOW_OVERRIDE_BORDER_COLOR] = hexColor;
+            SaveConfig();
+            Console.WriteLine($"Main window override border color set to: {hexColor}");
+        }
+
+        // Get/Set Main Window Border Opacity
+        public double GetMainWindowBorderOpacity()
+        {
+            string value = GetValue(MAIN_WINDOW_BORDER_OPACITY, "1.0");
+            if (double.TryParse(value, out double opacity) && opacity >= 0.0 && opacity <= 1.0)
+            {
+                return opacity;
+            }
+            return 1.0; // Default: 100% opacity (fully opaque)
+        }
+
+        public void SetMainWindowBorderOpacity(double opacity)
+        {
+            if (opacity >= 0.0 && opacity <= 1.0)
+            {
+                _configValues[MAIN_WINDOW_BORDER_OPACITY] = opacity.ToString("F2");
+                SaveConfig();
+                Console.WriteLine($"Main window border opacity set to: {opacity:F2}");
+            }
+            else
+            {
+                Console.WriteLine($"Invalid opacity value: {opacity}. Must be between 0.0 and 1.0.");
+            }
         }
 
         // Get/Set Monitor Text Area Expansion Width
@@ -2928,7 +3020,7 @@ Here is the input JSON:";
                 Console.WriteLine($"Monitor overlay mode set to: {mode}");
             }
         }
-        
+
         public string GetMainWindowOverlayMode()
         {
             return GetValue(MAIN_WINDOW_OVERLAY_MODE, "Translated"); // Default to Translated
@@ -2943,13 +3035,13 @@ Here is the input JSON:";
                 Console.WriteLine($"Main window overlay mode set to: {mode}");
             }
         }
-        
+
         public bool GetMainWindowMousePassthrough()
         {
             string value = GetValue(MAIN_WINDOW_MOUSE_PASSTHROUGH, "false");
             return value.Equals("true", StringComparison.OrdinalIgnoreCase);
         }
-        
+
         public void SetMainWindowMousePassthrough(bool enabled)
         {
             _configValues[MAIN_WINDOW_MOUSE_PASSTHROUGH] = enabled.ToString().ToLower();
@@ -2959,13 +3051,13 @@ Here is the input JSON:";
                 Console.WriteLine($"Main window mouse passthrough set to: {enabled}");
             }
         }
-        
+
         public bool GetWindowsVisibleInScreenshots()
         {
             string value = GetValue(WINDOWS_VISIBLE_IN_SCREENSHOTS, "false");
             return value.Equals("true", StringComparison.OrdinalIgnoreCase);
         }
-        
+
         public void SetWindowsVisibleInScreenshots(bool visible)
         {
             _configValues[WINDOWS_VISIBLE_IN_SCREENSHOTS] = visible.ToString().ToLower();
@@ -3051,14 +3143,14 @@ Here is the input JSON:";
             _configValues[OCR_WINDOW_HEIGHT] = height.ToString();
             SaveConfig();
         }
-        
+
         // Debug logging settings
         public bool GetLogExtraDebugStuff()
         {
             string value = GetValue(LOG_EXTRA_DEBUG_STUFF, "false");
             return value.Equals("true", StringComparison.OrdinalIgnoreCase);
         }
-        
+
         public void SetLogExtraDebugStuff(bool enabled)
         {
             _configValues[LOG_EXTRA_DEBUG_STUFF] = enabled.ToString().ToLower();
@@ -3067,7 +3159,7 @@ Here is the input JSON:";
         }
 
         // Font Settings methods
-        
+
         // Get/Set Source Language Font Family
         public string GetSourceLanguageFontFamily()
         {
@@ -3125,9 +3217,9 @@ Here is the input JSON:";
             SaveConfig();
             Console.WriteLine($"Target language font bold set to: {bold}");
         }
-        
+
         // Lesson feature methods
-        
+
         // Get/Set Lesson Prompt Template
         // The template should contain {0} as a placeholder for the text to learn
         public string GetLessonPromptTemplate()
@@ -3135,7 +3227,7 @@ Here is the input JSON:";
             string defaultValue = "Create a comprehensive lesson to help me learn about this Japanese text and its translation: \"{0}\"\n\nPlease include:\n1. A detailed breakdown table with columns for: Japanese text, Reading (furigana), Literal meaning, and Grammar notes\n2. Key vocabulary with example sentences\n3. Cultural or contextual notes if relevant\n4. At the end, provide 5 helpful flashcards in a clear format for memorization";
             return GetValue(LESSON_PROMPT_TEMPLATE, defaultValue);
         }
-        
+
         public void SetLessonPromptTemplate(string template)
         {
             if (!string.IsNullOrWhiteSpace(template))
@@ -3146,7 +3238,7 @@ Here is the input JSON:";
                 Console.WriteLine("Lesson prompt template updated");
             }
         }
-        
+
         // Get/Set Lesson URL Template
         // The template should contain {0} as a placeholder for the URL-encoded prompt
         public string GetLessonUrlTemplate()
@@ -3154,7 +3246,7 @@ Here is the input JSON:";
             string defaultValue = "https://chat.openai.com/?q={0}";
             return GetValue(LESSON_URL_TEMPLATE, defaultValue);
         }
-        
+
         public void SetLessonUrlTemplate(string urlTemplate)
         {
             if (!string.IsNullOrWhiteSpace(urlTemplate))
@@ -3165,7 +3257,7 @@ Here is the input JSON:";
                 Console.WriteLine("Lesson URL template updated");
             }
         }
-        
+
         // Service AutoStart preferences
         public bool GetServiceAutoStart(string serviceName)
         {
@@ -3173,7 +3265,7 @@ Here is the input JSON:";
             string value = GetValue(key, "false");
             return value.ToLower() == "true";
         }
-        
+
         public void SetServiceAutoStart(string serviceName, bool autoStart)
         {
             string key = $"service_{serviceName}_autostart";
